@@ -1,7 +1,10 @@
+// File: src/App.jsx
 import React, { useEffect, useRef } from 'react'
 import './index.css'
+import { GameProvider } from './game/contexts/GameContext'
+import StartScreen from './game/components/StartScreen'
 
-export default function App() {
+function AppContent() {
     const canvasRef = useRef(null)
 
     useEffect(() => {
@@ -10,19 +13,9 @@ export default function App() {
         canvas.width = 1024
         canvas.height = 576
 
-        let mounted = true
-        // Make sure this path exists: 'src/game/index.js'
-        import('./game/index.js')
-            .then(() => {
-                /* If your game exposes an init, call it here:
-                   mod.initGame?.({ canvas }) */
-            })
-            .catch((e) => {
-                console.error('Failed to load game module:', e)
-            })
-        return () => {
-            mounted = false
-        }
+        import('./game/index.js').catch((e) => {
+            console.error('Failed to load game module:', e)
+        })
     }, [])
 
     return (
@@ -44,47 +37,15 @@ export default function App() {
 
             <canvas ref={canvasRef} />
 
-            {/* Start screen overlay */}
-            <div
-                id="startScreen"
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    left: 0,
-                    background: 'url(/img/startScreenBackground.png)',
-                    zIndex: 20,
-                    backgroundSize: 'contain',
-                    backgroundRepeat: 'no-repeat',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}
-            >
-                <div style={{ textAlign: 'center' }}>
-                    <h1 style={{ color: 'white' }}>Space Invaders</h1>
-                    <div
-                        id="startButton"
-                        style={{ cursor: 'pointer', position: 'relative', display: 'inline-block' }}
-                    >
-                        <img src="/img/button.png" alt="Start Button" />
-                        <span
-                            style={{
-                                position: 'absolute',
-                                color: 'white',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)'
-                            }}
-                        >
-              Start
-            </span>
-                    </div>
-                </div>
+            {/* Original DOM start screen (hidden, but game code needs it) */}
+            <div id="startScreen" style={{ display: 'none' }}>
+                <div id="startButton"></div>
             </div>
 
-            {/* Restart screen overlay */}
+            {/* React start screen overlay */}
+            <StartScreen />
+
+            {/* Restart screen */}
             <div
                 id="restartScreen"
                 style={{
@@ -126,5 +87,13 @@ export default function App() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function App() {
+    return (
+        <GameProvider>
+            <AppContent />
+        </GameProvider>
     )
 }

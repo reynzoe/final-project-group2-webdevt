@@ -1,0 +1,126 @@
+/* File: src/styles/startScreen.css */
+.react-start-screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 40;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+}
+
+.react-start-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    padding: 32px;
+    border-radius: 12px;
+    color: #fff;
+    min-width: 360px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 80px rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.react-start-title {
+    margin: 0 0 24px 0;
+    font-size: 36px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.react-start-label {
+    display: block;
+    margin: 12px 0 6px 0;
+    font-size: 14px;
+    color: #bbb;
+    text-align: left;
+}
+
+.react-start-input {
+    width: 100%;
+    padding: 12px 14px;
+    margin: 0 0 16px 0;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.react-start-input:focus {
+    outline: none;
+    border-color: #2d8cff;
+}
+
+.react-start-button {
+    background: linear-gradient(135deg, #2d8cff 0%, #1e5fa8 100%);
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 6px 0;
+    font-size: 15px;
+    font-weight: 600;
+    width: 100%;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.react-start-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(45, 140, 255, 0.4);
+}
+
+.react-start-button:active {
+    transform: translateY(0);
+}
+
+.react-start-button.admin-btn {
+    background: linear-gradient(135deg, #ff6b35 0%, #d94a1a 100%);
+}
+
+.react-start-button.admin-btn:hover {
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+}
+
+.react-link-button {
+    background: transparent;
+    color: #888;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 8px;
+    transition: color 0.2s;
+}
+
+.react-link-button:hover {
+    color: #fff;
+}
+
+.react-error {
+    color: #ff6b6b;
+    margin: 8px 0;
+    font-size: 13px;
+    background: rgba(255, 107, 107, 0.1);
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.role-select {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+}
