@@ -154,17 +154,19 @@ function endGame() {
     document.querySelector('#finalScore').innerHTML = score
 
     // Submit score to backend
-    const playerName = window.__gameContext?.player?.name || 'anonymous'
-    submitScore({ username: playerName, score })
-        .then((doc) => console.log('Score saved:', doc))
-        .catch((err) => console.error('Failed to save score:', err))
-  }, 2000)
+    const { user, token } = window.__gameContext || {};
+    if (user && token) {
+      submitScore({ username: user.username, score, token })
+          .then((doc) => console.log('Score saved:', doc))
+          .catch((err) => console.error('Failed to save score:', err));
+    }
+  }, 2000);
 
   createParticles({
     object: player,
     color: 'white',
     fades: true
-  })
+  });
 }
 
 function animate() {

@@ -1,4 +1,3 @@
-// src/api/leaderboard.js
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5050';
 
 export async function fetchLeaderboard(signal) {
@@ -7,10 +6,13 @@ export async function fetchLeaderboard(signal) {
     return res.json();
 }
 
-export async function submitScore({ username, score }) {
+export async function submitScore({ username, score, token }) {
     const res = await fetch(`${API_BASE}/api/scores`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Add JWT token
+        },
         body: JSON.stringify({ username, score })
     });
     const data = await res.json();
