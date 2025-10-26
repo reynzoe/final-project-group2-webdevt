@@ -1,24 +1,29 @@
 // server/src/app.js
-import express from 'express'
-import cors from 'cors'
-import testRouter from './routes/test.js'
+import express from 'express';
+import cors from 'cors';
+import leaderboardRoutes from './routes/leaderboard.routes.js';
 
-const app = express()
+const app = express();
 
+// Fix CORS to allow requests from Vite dev server
 app.use(cors({
-    origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+    origin: ['http://localhost:5173', 'http://localhost:5174'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true
-}))
-app.use(express.json())
+}));
 
-app.get('/', (_req, res) => {
-    res.type('text').send('API is running. Try /health or /api/test')
-})
+app.use(express.json());
 
-app.get('/health', (_req, res) => {
-    res.json({ status: 'ok', pid: process.pid, timestamp: new Date() })
-})
+app.get('/health', (req, res) => {
+    res.json({ ok: true });
+});
 
-app.use('/api/test', testRouter)
+app.use(leaderboardRoutes);
 
-export default app
+app.use((req, res) => res.status(404).json({ error: 'Not found' }));
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+});
+
+export default app;

@@ -7,6 +7,7 @@ import { PowerUp } from './entities/PowerUp'
 import { Bomb } from './entities/Bomb'
 import { rectangularCollision, randomBetween } from './util'
 import { audio } from './audio'
+import { submitScore } from '../api/leaderboard.js'
 
 // paste these helpers somewhere near the top so they can use `particles`, `canvas`, `c`
 function createParticles({ object, color = 'white', fades = false, count = 15 }) {
@@ -120,18 +121,18 @@ function init() {
 
   for (let i = 0; i < 100; i++) {
     particles.push(
-      new Particle({
-        position: {
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height
-        },
-        velocity: {
-          x: 0,
-          y: 0.3
-        },
-        radius: Math.random() * 2,
-        color: 'white'
-      })
+        new Particle({
+          position: {
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height
+          },
+          velocity: {
+            x: 0,
+            y: 0.3
+          },
+          radius: Math.random() * 2,
+          color: 'white'
+        })
     )
   }
 }
@@ -151,6 +152,12 @@ function endGame() {
     game.active = false
     document.querySelector('#restartScreen').style.display = 'flex'
     document.querySelector('#finalScore').innerHTML = score
+
+    // Submit score to backend
+    const playerName = window.__gameContext?.player?.name || 'anonymous'
+    submitScore({ username: playerName, score })
+        .then((doc) => console.log('Score saved:', doc))
+        .catch((err) => console.error('Failed to save score:', err))
   }, 2000)
 
   createParticles({
@@ -169,7 +176,7 @@ function animate() {
 
   if (elapsed < fpsInterval) return
 
-  msPrev = msNow - (elapsed % fpsInterval) // 3.34
+  msPrev = msNow - (elapsed % fpsInterval)
 
   c.fillStyle = 'black'
   c.fillRect(0, 0, canvas.width, canvas.height)
@@ -185,32 +192,32 @@ function animate() {
   // spawn powerups
   if (frames % 500 === 0) {
     powerUps.push(
-      new PowerUp({
-        position: {
-          x: 0,
-          y: Math.random() * 300 + 15
-        },
-        velocity: {
-          x: 5,
-          y: 0
-        }
-      })
+        new PowerUp({
+          position: {
+            x: 0,
+            y: Math.random() * 300 + 15
+          },
+          velocity: {
+            x: 5,
+            y: 0
+          }
+        })
     )
   }
 
   // spawn bombs
   if (frames % 200 === 0 && bombs.length < 3) {
     bombs.push(
-      new Bomb({
-        position: {
-          x: randomBetween(Bomb.radius, canvas.width - Bomb.radius),
-          y: randomBetween(Bomb.radius, canvas.height - Bomb.radius)
-        },
-        velocity: {
-          x: (Math.random() - 0.5) * 6,
-          y: (Math.random() - 0.5) * 6
-        }
-      })
+        new Bomb({
+          position: {
+            x: randomBetween(Bomb.radius, canvas.width - Bomb.radius),
+            y: randomBetween(Bomb.radius, canvas.height - Bomb.radius)
+          },
+          velocity: {
+            x: (Math.random() - 0.5) * 6,
+            y: (Math.random() - 0.5) * 6
+          }
+        })
     )
   }
 
@@ -248,8 +255,8 @@ function animate() {
 
   invaderProjectiles.forEach((invaderProjectile, index) => {
     if (
-      invaderProjectile.position.y + invaderProjectile.height >=
-      canvas.height
+        invaderProjectile.position.y + invaderProjectile.height >=
+        canvas.height
     ) {
       setTimeout(() => {
         invaderProjectiles.splice(index, 1)
@@ -258,10 +265,10 @@ function animate() {
 
     // projectile hits player
     if (
-      rectangularCollision({
-        rectangle1: invaderProjectile,
-        rectangle2: player
-      })
+        rectangularCollision({
+          rectangle1: invaderProjectile,
+          rectangle2: player
+        })
     ) {
       invaderProjectiles.splice(index, 1)
       endGame()
@@ -276,12 +283,12 @@ function animate() {
 
       // if projectile touches bomb, remove projectile
       if (
-        Math.hypot(
-          projectile.position.x - bomb.position.x,
-          projectile.position.y - bomb.position.y
-        ) <
+          Math.hypot(
+              projectile.position.x - bomb.position.x,
+              projectile.position.y - bomb.position.y
+          ) <
           projectile.radius + bomb.radius &&
-        !bomb.active
+          !bomb.active
       ) {
         projectiles.splice(i, 1)
         bomb.explode()
@@ -291,13 +298,13 @@ function animate() {
     for (let j = powerUps.length - 1; j >= 0; j--) {
       const powerUp = powerUps[j]
 
-      // if projectile touches bomb, remove projectile
+      // if projectile touches powerup, remove projectile
       if (
-        Math.hypot(
-          projectile.position.x - powerUp.position.x,
-          projectile.position.y - powerUp.position.y
-        ) <
-        projectile.radius + powerUp.radius
+          Math.hypot(
+              projectile.position.x - powerUp.position.x,
+              projectile.position.y - powerUp.position.y
+          ) <
+          projectile.radius + powerUp.radius
       ) {
         projectiles.splice(i, 1)
         powerUps.splice(j, 1)
@@ -325,7 +332,7 @@ function animate() {
     // spawn projectiles
     if (frames % 100 === 0 && grid.invaders.length > 0) {
       grid.invaders[Math.floor(Math.random() * grid.invaders.length)].shoot(
-        invaderProjectiles
+          invaderProjectiles
       )
     }
 
@@ -340,12 +347,12 @@ function animate() {
 
         // if bomb touches invader, remove invader
         if (
-          Math.hypot(
-            invader.position.x - bomb.position.x,
-            invader.position.y - bomb.position.y
-          ) <
+            Math.hypot(
+                invader.position.x - bomb.position.x,
+                invader.position.y - bomb.position.y
+            ) <
             invaderRadius + bomb.radius &&
-          bomb.active
+            bomb.active
         ) {
           score += 50
           scoreEl.innerHTML = score
@@ -366,19 +373,19 @@ function animate() {
       // projectiles hit enemy
       projectiles.forEach((projectile, j) => {
         if (
-          projectile.position.y - projectile.radius <=
+            projectile.position.y - projectile.radius <=
             invader.position.y + invader.height &&
-          projectile.position.x + projectile.radius >= invader.position.x &&
-          projectile.position.x - projectile.radius <=
+            projectile.position.x + projectile.radius >= invader.position.x &&
+            projectile.position.x - projectile.radius <=
             invader.position.x + invader.width &&
-          projectile.position.y + projectile.radius >= invader.position.y
+            projectile.position.y + projectile.radius >= invader.position.y
         ) {
           setTimeout(() => {
             const invaderFound = grid.invaders.find(
-              (invader2) => invader2 === invader
+                (invader2) => invader2 === invader
             )
             const projectileFound = projectiles.find(
-              (projectile2) => projectile2 === projectile
+                (projectile2) => projectile2 === projectile
             )
 
             // remove invader and projectile
@@ -406,9 +413,9 @@ function animate() {
                 const lastInvader = grid.invaders[grid.invaders.length - 1]
 
                 grid.width =
-                  lastInvader.position.x -
-                  firstInvader.position.x +
-                  lastInvader.width
+                    lastInvader.position.x -
+                    firstInvader.position.x +
+                    lastInvader.width
                 grid.position.x = firstInvader.position.x
               } else {
                 grids.splice(gridIndex, 1)
@@ -420,22 +427,22 @@ function animate() {
 
       // remove player if invaders touch it
       if (
-        rectangularCollision({
-          rectangle1: invader,
-          rectangle2: player
-        }) &&
-        !game.over
+          rectangularCollision({
+            rectangle1: invader,
+            rectangle2: player
+          }) &&
+          !game.over
       )
         endGame()
-    } // end looping over grid.invaders
+    }
   })
 
   if (keys.a.pressed && player.position.x >= 0) {
     player.velocity.x = -7
     player.rotation = -0.15
   } else if (
-    keys.d.pressed &&
-    player.position.x + player.width <= canvas.width
+      keys.d.pressed &&
+      player.position.x + player.width <= canvas.width
   ) {
     player.velocity.x = 7
     player.rotation = 0.15
@@ -454,24 +461,24 @@ function animate() {
   }
 
   if (
-    keys.space.pressed &&
-    player.powerUp === 'MachineGun' &&
-    frames % 2 === 0 &&
-    !game.over
+      keys.space.pressed &&
+      player.powerUp === 'MachineGun' &&
+      frames % 2 === 0 &&
+      !game.over
   ) {
     if (frames % 6 === 0) audio.shoot.play()
     projectiles.push(
-      new Projectile({
-        position: {
-          x: player.position.x + player.width / 2,
-          y: player.position.y
-        },
-        velocity: {
-          x: 0,
-          y: -10
-        },
-        color: 'yellow'
-      })
+        new Projectile({
+          position: {
+            x: player.position.x + player.width / 2,
+            y: player.position.y
+          },
+          velocity: {
+            x: 0,
+            y: -10
+          },
+          color: 'yellow'
+        })
     )
   }
 
@@ -512,16 +519,16 @@ addEventListener('keydown', ({ key }) => {
 
       audio.shoot.play()
       projectiles.push(
-        new Projectile({
-          position: {
-            x: player.position.x + player.width / 2,
-            y: player.position.y
-          },
-          velocity: {
-            x: 0,
-            y: -10
-          }
-        })
+          new Projectile({
+            position: {
+              x: player.position.x + player.width / 2,
+              y: player.position.y
+            },
+            velocity: {
+              x: 0,
+              y: -10
+            }
+          })
       )
 
       break

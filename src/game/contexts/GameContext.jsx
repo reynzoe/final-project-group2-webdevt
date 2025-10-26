@@ -1,10 +1,10 @@
-// File: src/game/contexts/GameContext.jsx
-import React, { createContext, useContext, useState } from 'react'
+// src/game/contexts/GameContext.jsx
+import React, { createContext, useContext, useState, useEffect } from 'react'
 
 const GameContext = createContext(null)
 
 export function GameProvider({ children }) {
-    const [player, setPlayer] = useState(null) // { name, role }
+    const [player, setPlayer] = useState(null)
     const [started, setStarted] = useState(false)
 
     function startGame({ name, role }) {
@@ -18,11 +18,13 @@ export function GameProvider({ children }) {
         setStarted(false)
     }
 
-    return (
-        <GameContext.Provider value={{ player, started, startGame, resetGame }}>
-            {children}
-        </GameContext.Provider>
-    )
+    const value = { player, started, startGame, resetGame }
+
+    useEffect(() => {
+        window.__gameContext = value
+    }, [value])
+
+    return <GameContext.Provider value={value}>{children}</GameContext.Provider>
 }
 
 export function useGame() {
