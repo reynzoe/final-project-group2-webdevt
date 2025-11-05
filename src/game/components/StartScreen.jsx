@@ -71,6 +71,7 @@ export default function StartScreen() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [showLeaderboard, setShowLeaderboard] = useState(false);
+    const [guestPlaying, setGuestPlaying] = useState(false);
 
     async function handleRegister() {
         try {
@@ -98,6 +99,13 @@ export default function StartScreen() {
         if (startButton) startButton.click();
     }
 
+    function handleGuestPlay() {
+        setGuestPlaying(true);
+        startGame();
+        const startButton = document.querySelector('#startButton');
+        if (startButton) startButton.click();
+    }
+
     function handleLogout() {
         logout();
         setStage('welcome');
@@ -118,8 +126,13 @@ export default function StartScreen() {
         );
     }
 
+    // Hide screen when game starts (for both logged-in users and guests)
+    if (started || guestPlaying) {
+        return null;
+    }
+
     // If user is logged in, show logged-in screen
-    if (user && !started) {
+    if (user) {
         return (
             <div className="react-start-screen">
                 <div className="react-start-card">
@@ -142,11 +155,6 @@ export default function StartScreen() {
         );
     }
 
-    // Hide screen when game starts
-    if (started) {
-        return null;
-    }
-
     return (
         <div className="react-start-screen">
             <div className="react-start-card">
@@ -159,6 +167,9 @@ export default function StartScreen() {
                         </button>
                         <button className="react-start-button" onClick={() => setStage('register')}>
                             ✨ Register
+                        </button>
+                        <button className="react-start-button" onClick={handleGuestPlay}>
+                            🎮 Play as Guest
                         </button>
                         <button className="react-link-button" onClick={() => setShowLeaderboard(true)}>
                             🏆 View Leaderboard

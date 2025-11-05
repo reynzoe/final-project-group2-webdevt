@@ -18,8 +18,8 @@ const ScoreSchema = new Schema(
         },
         coins: {
             type: Number,
-            required: true,
-            min: 0
+            required: false,
+            min: 0,
         }
     },
     {
