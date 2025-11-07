@@ -167,7 +167,7 @@ export default function StartScreen() {
     return (
         <div className="react-start-screen">
             <div className="react-start-card">
-                <h1 className="react-start-title">Lowell Invasion</h1>
+                <h1 className="react-start-title">Star Killer</h1>
 
                 {stage === 'welcome' && (
                     <>
