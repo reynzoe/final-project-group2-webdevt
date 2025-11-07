@@ -7,7 +7,7 @@ import { PowerUp } from './entities/PowerUp'
 import { Bomb } from './entities/Bomb'
 import { rectangularCollision, randomBetween } from './util'
 import { audio } from './audio'
-import { submitScore } from '../api/leaderboard.js'
+import { submitScore,  } from '../api/leaderboard.js'
 
 // paste these helpers somewhere near the top so they can use `particles`, `canvas`, `c`
 function createParticles({ object, color = 'white', fades = false, count = 15 }) {
@@ -486,7 +486,6 @@ function animate() {
 
   frames++
 }
-
 document.querySelector('#startButton').addEventListener('click', () => {
   audio.backgroundMusic.play()
   audio.start.play()
@@ -497,12 +496,105 @@ document.querySelector('#startButton').addEventListener('click', () => {
   animate()
 })
 
-document.querySelector('#restartButton').addEventListener('click', () => {
-  audio.select.play()
-  document.querySelector('#restartScreen').style.display = 'none'
-  init()
-  animate()
-})
+// View leaderboard button
+const viewBtn = document.querySelector('#viewLeaderboardButton')
+if (viewBtn) {
+  viewBtn.addEventListener('click', async () => {
+    audio.select.play()
+    try {
+      const { fetchLeaderboard } = await import('../api/leaderboard.js')
+      const controller = new AbortController()
+      const list = await fetchLeaderboard(controller.signal)
+
+      const overlay = document.createElement('div')
+      overlay.id = 'leaderboardOverlay'
+      Object.assign(overlay.style, {
+        position: 'fixed',
+        inset: '0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(0,0,0,0.85)',
+        zIndex: 10000
+      })
+
+      const panel = document.createElement('div')
+      Object.assign(panel.style, {
+        background: '#0b0b0b',
+        color: 'white',
+        padding: '18px',
+        borderRadius: '8px',
+        maxHeight: '80vh',
+        overflow: 'auto',
+        width: '90%',
+        maxWidth: '600px',
+        boxSizing: 'border-box'
+      })
+
+      const title = document.createElement('h2')
+      title.textContent = 'Leaderboard'
+      title.style.marginTop = '0'
+      panel.appendChild(title)
+
+      if (!Array.isArray(list) || list.length === 0) {
+        const empty = document.createElement('p')
+        empty.textContent = 'No scores yet.'
+        panel.appendChild(empty)
+      } else {
+        const ol = document.createElement('ol')
+        ol.style.paddingLeft = '18px'
+        list.forEach((entry) => {
+          const li = document.createElement('li')
+          li.style.marginBottom = '8px'
+          li.textContent = `${entry.username} — ${entry.score}`
+          ol.appendChild(li)
+        })
+        panel.appendChild(ol)
+      }
+
+      const close = document.createElement('button')
+      close.textContent = 'Close'
+      Object.assign(close.style, {
+        marginTop: '12px',
+        padding: '8px 12px',
+        cursor: 'pointer',
+        borderRadius: '6px',
+        border: 'none',
+        background: '#222',
+        color: 'white'
+      })
+      close.addEventListener('click', () => overlay.remove())
+      panel.appendChild(close)
+
+      overlay.appendChild(panel)
+      document.body.appendChild(overlay)
+    } catch (err) {
+      console.error('Could not load leaderboard:', err)
+      alert('Failed to load leaderboard.')
+    }
+  })
+}
+
+// Main menu button
+// Main menu button
+const mainBtn = document.querySelector('#mainMenuButton')
+if (mainBtn) {
+  mainBtn.addEventListener('click', () => {
+    audio.select.play()
+    document.querySelector('#restartScreen').style.display = 'none'
+    document.querySelector('#scoreContainer').style.display = 'none'
+    game.active = false
+    game.over = true
+
+    // Stop background music and reset game context
+    audio.backgroundMusic.stop()
+
+    const ctx = window.__gameContext
+    if (ctx && typeof ctx.resetGame === 'function') {
+      ctx.resetGame()
+    }
+  })
+}
 
 addEventListener('keydown', ({ key }) => {
   if (game.over) return

@@ -67,22 +67,53 @@ function AppContent() {
                     <h1 style={{ color: 'white', fontSize: 24 }}>Game Over</h1>
                     <h1 id="finalScore" style={{ color: 'white', margin: 0, fontSize: 48 }}>0</h1>
                     <p style={{ color: 'white', marginTop: 0 }}>Points</p>
-                    <div
-                        id="restartButton"
-                        style={{ cursor: 'pointer', position: 'relative', display: 'inline-block' }}
-                    >
-                        <img src="/img/button.png" alt="Restart Button" />
-                        <span
+
+                    <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 12 }}>
+                        <div
+                            id="restartButton"
+                            style={{ cursor: 'pointer', position: 'relative', display: 'inline-block' }}
+                        >
+                            <img src="/img/button.png" alt="Restart Button" />
+                            <span
+                                style={{
+                                    position: 'absolute',
+                                    color: 'white',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)'
+                                }}
+                            >
+          Restart
+        </span>
+                        </div>
+
+                        <button
+                            id="viewLeaderboardButton"
                             style={{
-                                position: 'absolute',
+                                padding: '8px 12px',
+                                background: '#222',
                                 color: 'white',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)'
+                                border: '1px solid #444',
+                                borderRadius: 6,
+                                cursor: 'pointer'
                             }}
                         >
-              Restart
-            </span>
+                            View Leaderboard
+                        </button>
+
+                        <button
+                            id="mainMenuButton"
+                            style={{
+                                padding: '8px 12px',
+                                background: '#222',
+                                color: 'white',
+                                border: '1px solid #444',
+                                borderRadius: 6,
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Main Menu
+                        </button>
                     </div>
                 </div>
             </div>

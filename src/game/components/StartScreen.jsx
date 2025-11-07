@@ -73,6 +73,15 @@ export default function StartScreen() {
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [guestPlaying, setGuestPlaying] = useState(false);
 
+    // Listen for game reset event
+    useEffect(() => {
+        function handleReset() {
+            setGuestPlaying(false);
+        }
+        window.addEventListener('gameReset', handleReset);
+        return () => window.removeEventListener('gameReset', handleReset);
+    }, []);
+
     async function handleRegister() {
         try {
             setError('');

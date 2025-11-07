@@ -87,7 +87,10 @@ export function GameProvider({ children }) {
 
     function resetGame() {
         setStarted(false);
+        // Emit a custom event so StartScreen can reset its local state
+        window.dispatchEvent(new Event('gameReset'));
     }
+
 
     const value = {
         user,
