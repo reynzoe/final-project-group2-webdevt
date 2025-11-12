@@ -1,52 +1,19 @@
 // src/game/index.js
 import { Player } from './entities/Player'
 import { Projectile } from './entities/Projectile'
-import { Grid } from './entities/Grid'
-import { Particle } from './entities/Particle'
-import { PowerUp } from './entities/PowerUp'
-import { Bomb } from './entities/Bomb'
-import { rectangularCollision, randomBetween } from './util'
+import { rectangularCollision } from './util'
 import { audio } from './audio'
-import { submitScore,  } from '../api/leaderboard.js'
-
-// paste these helpers somewhere near the top so they can use `particles`, `canvas`, `c`
-function createParticles({ object, color = 'white', fades = false, count = 15 }) {
-  for (let i = 0; i < count; i++) {
-    particles.push(
-        new Particle({
-          position: {
-            x: object.position.x + (object.width ? object.width / 2 : 0),
-            y: object.position.y + (object.height ? object.height / 2 : 0)
-          },
-          velocity: {
-            x: (Math.random() - 0.5) * 4,
-            y: (Math.random() - 0.5) * 4
-          },
-          radius: Math.random() * 2 + 1,
-          color,
-          fades
-        })
-    )
-  }
-}
-
-function createScoreLabel({ object, score = 100 }) {
-  const el = document.createElement('div')
-  el.textContent = `+${score}`
-  el.style.position = 'absolute'
-  el.style.left = `${object.position.x}px`
-  el.style.top = `${object.position.y}px`
-  el.style.color = 'white'
-  el.style.fontSize = '14px'
-  el.style.pointerEvents = 'none'
-  el.style.transition = 'transform 0.6s ease-out, opacity 0.6s ease-out'
-  document.body.appendChild(el)
-  requestAnimationFrame(() => {
-    el.style.transform = 'translateY(-20px)'
-    el.style.opacity = '0'
-  })
-  setTimeout(() => el.remove(), 650)
-}
+import { GameState } from './gameState'
+import { createParticles, createStarfield } from './effects'
+import {
+  spawnPowerUps,
+  spawnBombs,
+  spawnEnemies,
+  handleProjectileCollisions,
+  handleGridCollisions,
+  endGame
+} from './gameLogic'
+import { setupKeyboardControls, setupUIHandlers } from './eventHandlers'
 
 const scoreEl = document.querySelector('#scoreEl')
 const canvas = document.querySelector('canvas')
@@ -55,192 +22,55 @@ const c = canvas.getContext('2d')
 canvas.width = 1024
 canvas.height = 576
 
-let player = new Player()
-let projectiles = []
-let grids = []
-let invaderProjectiles = []
-let particles = []
-let bombs = []
-let powerUps = []
-
-let keys = {
-  a: {
-    pressed: false
-  },
-  d: {
-    pressed: false
-  },
-  space: {
-    pressed: false
-  }
-}
-
-let frames = 0
-let randomInterval = Math.floor(Math.random() * 500 + 500)
-let game = {
-  over: false,
-  active: true
-}
-let score = 0
-
-let spawnBuffer = 500
-let fps = 60
-let fpsInterval = 1000 / fps
-let msPrev = window.performance.now()
+const gameState = new GameState()
+let animationId = null
 
 function init() {
-  player = new Player()
-  projectiles = []
-  grids = []
-  invaderProjectiles = []
-  particles = []
-  bombs = []
-  powerUps = []
+  gameState.reset()
+  gameState.player = new Player()
 
-  keys = {
-    a: {
-      pressed: false
-    },
-    d: {
-      pressed: false
-    },
-    space: {
-      pressed: false
+  document.querySelector('#finalScore').innerHTML = gameState.score
+  document.querySelector('#scoreEl').innerHTML = gameState.score
+
+  createStarfield(canvas, gameState.particles)
+}
+
+function updatePowerUps(canvas) {
+  for (let i = gameState.powerUps.length - 1; i >= 0; i--) {
+    const powerUp = gameState.powerUps[i]
+    if (powerUp.position.x - powerUp.radius >= canvas.width) {
+      gameState.powerUps.splice(i, 1)
+    } else {
+      powerUp.update()
     }
-  }
-
-  frames = 0
-  randomInterval = Math.floor(Math.random() * 500 + 500)
-  game = {
-    over: false,
-    active: true
-  }
-  score = 0
-  document.querySelector('#finalScore').innerHTML = score
-  document.querySelector('#scoreEl').innerHTML = score
-
-  for (let i = 0; i < 100; i++) {
-    particles.push(
-        new Particle({
-          position: {
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height
-          },
-          velocity: {
-            x: 0,
-            y: 0.3
-          },
-          radius: Math.random() * 2,
-          color: 'white'
-        })
-    )
   }
 }
 
-function endGame() {
-  console.log('you lose')
-  audio.gameOver.play()
-
-  // Makes player disappear
-  setTimeout(() => {
-    player.opacity = 0
-    game.over = true
-  }, 0)
-
-  // stops game altogether
-  setTimeout(() => {
-    game.active = false
-    document.querySelector('#restartScreen').style.display = 'flex'
-    document.querySelector('#finalScore').innerHTML = score
-
-    // Submit score to backend
-    const { user, token } = window.__gameContext || {};
-    if (user && token) {
-      submitScore({ username: user.username, score, token })
-          .then((doc) => console.log('Score saved:', doc))
-          .catch((err) => console.error('Failed to save score:', err));
-    }
-  }, 2000);
-
-  createParticles({
-    object: player,
-    color: 'white',
-    fades: true
-  });
-}
-
-function animate() {
-  if (!game.active) return
-  requestAnimationFrame(animate)
-
-  const msNow = window.performance.now()
-  const elapsed = msNow - msPrev
-
-  if (elapsed < fpsInterval) return
-
-  msPrev = msNow - (elapsed % fpsInterval)
-
-  c.fillStyle = 'black'
-  c.fillRect(0, 0, canvas.width, canvas.height)
-
-  for (let i = powerUps.length - 1; i >= 0; i--) {
-    const powerUp = powerUps[i]
-
-    if (powerUp.position.x - powerUp.radius >= canvas.width)
-      powerUps.splice(i, 1)
-    else powerUp.update()
-  }
-
-  // spawn powerups
-  if (frames % 500 === 0) {
-    powerUps.push(
-        new PowerUp({
-          position: {
-            x: 0,
-            y: Math.random() * 300 + 15
-          },
-          velocity: {
-            x: 5,
-            y: 0
-          }
-        })
-    )
-  }
-
-  // spawn bombs
-  if (frames % 200 === 0 && bombs.length < 3) {
-    bombs.push(
-        new Bomb({
-          position: {
-            x: randomBetween(Bomb.radius, canvas.width - Bomb.radius),
-            y: randomBetween(Bomb.radius, canvas.height - Bomb.radius)
-          },
-          velocity: {
-            x: (Math.random() - 0.5) * 6,
-            y: (Math.random() - 0.5) * 6
-          }
-        })
-    )
-  }
-
-  for (let i = bombs.length - 1; i >= 0; i--) {
-    const bomb = bombs[i]
-
+function updateBombs() {
+  for (let i = gameState.bombs.length - 1; i >= 0; i--) {
+    const bomb = gameState.bombs[i]
     if (bomb.opacity <= 0) {
-      bombs.splice(i, 1)
-    } else bomb.update()
+      gameState.bombs.splice(i, 1)
+    } else {
+      bomb.update()
+    }
   }
+}
 
-  player.update()
+function updatePlayer() {
+  gameState.player.update()
 
-  for (let i = player.particles.length - 1; i >= 0; i--) {
-    const particle = player.particles[i]
+  for (let i = gameState.player.particles.length - 1; i >= 0; i--) {
+    const particle = gameState.player.particles[i]
     particle.update()
-
-    if (particle.opacity === 0) player.particles[i].splice(i, 1)
+    if (particle.opacity === 0) {
+      gameState.player.particles.splice(i, 1)
+    }
   }
+}
 
-  particles.forEach((particle, i) => {
+function updateParticles(canvas) {
+  gameState.particles.forEach((particle, i) => {
     if (particle.position.y - particle.radius >= canvas.height) {
       particle.position.x = Math.random() * canvas.width
       particle.position.y = -particle.radius
@@ -248,398 +78,132 @@ function animate() {
 
     if (particle.opacity <= 0) {
       setTimeout(() => {
-        particles.splice(i, 1)
+        gameState.particles.splice(i, 1)
       }, 0)
     } else {
       particle.update()
     }
   })
+}
 
-  invaderProjectiles.forEach((invaderProjectile, index) => {
-    if (
-        invaderProjectile.position.y + invaderProjectile.height >=
-        canvas.height
-    ) {
+function updateInvaderProjectiles(canvas) {
+  gameState.invaderProjectiles.forEach((invaderProjectile, index) => {
+    if (invaderProjectile.position.y + invaderProjectile.height >= canvas.height) {
       setTimeout(() => {
-        invaderProjectiles.splice(index, 1)
+        gameState.invaderProjectiles.splice(index, 1)
       }, 0)
-    } else invaderProjectile.update()
-
-    // projectile hits player
-    if (
-        rectangularCollision({
-          rectangle1: invaderProjectile,
-          rectangle2: player
-        })
-    ) {
-      invaderProjectiles.splice(index, 1)
-      endGame()
-    }
-  })
-
-  for (let i = projectiles.length - 1; i >= 0; i--) {
-    const projectile = projectiles[i]
-
-    for (let j = bombs.length - 1; j >= 0; j--) {
-      const bomb = bombs[j]
-
-      // if projectile touches bomb, remove projectile
-      if (
-          Math.hypot(
-              projectile.position.x - bomb.position.x,
-              projectile.position.y - bomb.position.y
-          ) <
-          projectile.radius + bomb.radius &&
-          !bomb.active
-      ) {
-        projectiles.splice(i, 1)
-        bomb.explode()
-      }
-    }
-
-    for (let j = powerUps.length - 1; j >= 0; j--) {
-      const powerUp = powerUps[j]
-
-      // if projectile touches powerup, remove projectile
-      if (
-          Math.hypot(
-              projectile.position.x - powerUp.position.x,
-              projectile.position.y - powerUp.position.y
-          ) <
-          projectile.radius + powerUp.radius
-      ) {
-        projectiles.splice(i, 1)
-        powerUps.splice(j, 1)
-        player.powerUp = 'MachineGun'
-        console.log('powerup started')
-        audio.bonus.play()
-
-        setTimeout(() => {
-          player.powerUp = null
-          console.log('powerup ended')
-        }, 5000)
-      }
-    }
-
-    if (projectile.position.y + projectile.radius <= 0) {
-      projectiles.splice(i, 1)
     } else {
-      projectile.update()
-    }
-  }
-
-  grids.forEach((grid, gridIndex) => {
-    grid.update()
-
-    // spawn projectiles
-    if (frames % 100 === 0 && grid.invaders.length > 0) {
-      grid.invaders[Math.floor(Math.random() * grid.invaders.length)].shoot(
-          invaderProjectiles
-      )
+      invaderProjectile.update()
     }
 
-    for (let i = grid.invaders.length - 1; i >= 0; i--) {
-      const invader = grid.invaders[i]
-      invader.update({ velocity: grid.velocity })
-
-      for (let j = bombs.length - 1; j >= 0; j--) {
-        const bomb = bombs[j]
-
-        const invaderRadius = 15
-
-        // if bomb touches invader, remove invader
-        if (
-            Math.hypot(
-                invader.position.x - bomb.position.x,
-                invader.position.y - bomb.position.y
-            ) <
-            invaderRadius + bomb.radius &&
-            bomb.active
-        ) {
-          score += 50
-          scoreEl.innerHTML = score
-
-          grid.invaders.splice(i, 1)
-          createScoreLabel({
-            object: invader,
-            score: 50
-          })
-
-          createParticles({
-            object: invader,
-            fades: true
-          })
-        }
-      }
-
-      // projectiles hit enemy
-      projectiles.forEach((projectile, j) => {
-        if (
-            projectile.position.y - projectile.radius <=
-            invader.position.y + invader.height &&
-            projectile.position.x + projectile.radius >= invader.position.x &&
-            projectile.position.x - projectile.radius <=
-            invader.position.x + invader.width &&
-            projectile.position.y + projectile.radius >= invader.position.y
-        ) {
-          setTimeout(() => {
-            const invaderFound = grid.invaders.find(
-                (invader2) => invader2 === invader
-            )
-            const projectileFound = projectiles.find(
-                (projectile2) => projectile2 === projectile
-            )
-
-            // remove invader and projectile
-            if (invaderFound && projectileFound) {
-              score += 100
-              scoreEl.innerHTML = score
-
-              // dynamic score labels
-              createScoreLabel({
-                object: invader
-              })
-
-              createParticles({
-                object: invader,
-                fades: true
-              })
-
-              // singular projectile hits an enemy
-              audio.explode.play()
-              grid.invaders.splice(i, 1)
-              projectiles.splice(j, 1)
-
-              if (grid.invaders.length > 0) {
-                const firstInvader = grid.invaders[0]
-                const lastInvader = grid.invaders[grid.invaders.length - 1]
-
-                grid.width =
-                    lastInvader.position.x -
-                    firstInvader.position.x +
-                    lastInvader.width
-                grid.position.x = firstInvader.position.x
-              } else {
-                grids.splice(gridIndex, 1)
-              }
-            }
-          }, 0)
-        }
-      })
-
-      // remove player if invaders touch it
-      if (
-          rectangularCollision({
-            rectangle1: invader,
-            rectangle2: player
-          }) &&
-          !game.over
-      )
-        endGame()
+    if (rectangularCollision({ rectangle1: invaderProjectile, rectangle2: gameState.player })) {
+      gameState.invaderProjectiles.splice(index, 1)
+      endGame(gameState, gameState.player, canvas)
     }
   })
+}
 
-  if (keys.a.pressed && player.position.x >= 0) {
-    player.velocity.x = -7
-    player.rotation = -0.15
-  } else if (
-      keys.d.pressed &&
-      player.position.x + player.width <= canvas.width
-  ) {
-    player.velocity.x = 7
-    player.rotation = 0.15
+function handlePlayerMovement(canvas) {
+  if (gameState.keys.a.pressed && gameState.player.position.x >= 0) {
+    gameState.player.velocity.x = -7
+    gameState.player.rotation = -0.15
+  } else if (gameState.keys.d.pressed && gameState.player.position.x + gameState.player.width <= canvas.width) {
+    gameState.player.velocity.x = 7
+    gameState.player.rotation = 0.15
   } else {
-    player.velocity.x = 0
-    player.rotation = 0
+    gameState.player.velocity.x = 0
+    gameState.player.rotation = 0
   }
+}
 
-  // spawning enemies
-  if (frames % randomInterval === 0) {
-    spawnBuffer = spawnBuffer < 0 ? 100 : spawnBuffer
-    grids.push(new Grid())
-    randomInterval = Math.floor(Math.random() * 500 + spawnBuffer)
-    frames = 0
-    spawnBuffer -= 100
-  }
-
+function handleMachineGun() {
   if (
-      keys.space.pressed &&
-      player.powerUp === 'MachineGun' &&
-      frames % 2 === 0 &&
-      !game.over
+    gameState.keys.space.pressed &&
+    gameState.player.powerUp === 'MachineGun' &&
+    gameState.frames % 2 === 0 &&
+    !gameState.game.over
   ) {
-    if (frames % 6 === 0) audio.shoot.play()
-    projectiles.push(
-        new Projectile({
-          position: {
-            x: player.position.x + player.width / 2,
-            y: player.position.y
-          },
-          velocity: {
-            x: 0,
-            y: -10
-          },
-          color: 'yellow'
-        })
+    if (gameState.frames % 6 === 0) audio.shoot.play()
+    gameState.projectiles.push(
+      new Projectile({
+        position: {
+          x: gameState.player.position.x + gameState.player.width / 2,
+          y: gameState.player.position.y
+        },
+        velocity: {
+          x: 0,
+          y: -10
+        },
+        color: 'yellow'
+      })
     )
   }
-
-  frames++
 }
+
+function animate() {
+  if (!gameState.game.active) {
+    if (animationId) {
+      cancelAnimationFrame(animationId)
+      animationId = null
+    }
+    return
+  }
+
+  animationId = requestAnimationFrame(animate)
+
+  const msNow = window.performance.now()
+  const elapsed = msNow - gameState.msPrev
+
+  if (elapsed < gameState.fpsInterval) return
+
+  gameState.msPrev = msNow - (elapsed % gameState.fpsInterval)
+
+  c.fillStyle = 'black'
+  c.fillRect(0, 0, canvas.width, canvas.height)
+
+  updatePowerUps(canvas)
+  spawnPowerUps(gameState, canvas)
+
+  updateBombs()
+  spawnBombs(gameState, canvas)
+
+  updatePlayer()
+  updateParticles(canvas)
+  updateInvaderProjectiles(canvas)
+
+  handleProjectileCollisions(gameState, canvas, gameState.player)
+  handleGridCollisions(gameState, gameState.player, canvas)
+  handlePlayerMovement(canvas)
+
+  spawnEnemies(gameState)
+  handleMachineGun()
+
+  gameState.frames++
+}
+
 document.querySelector('#startButton').addEventListener('click', () => {
   audio.backgroundMusic.play()
   audio.start.play()
 
   document.querySelector('#startScreen').style.display = 'none'
   document.querySelector('#scoreContainer').style.display = 'block'
+
   init()
   animate()
 })
 
-// View leaderboard button
-const viewBtn = document.querySelector('#viewLeaderboardButton')
-if (viewBtn) {
-  viewBtn.addEventListener('click', async () => {
-    audio.select.play()
-    try {
-      const { fetchLeaderboard } = await import('../api/leaderboard.js')
-      const controller = new AbortController()
-      const list = await fetchLeaderboard(controller.signal)
-
-      const overlay = document.createElement('div')
-      overlay.id = 'leaderboardOverlay'
-      Object.assign(overlay.style, {
-        position: 'fixed',
-        inset: '0',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(0,0,0,0.85)',
-        zIndex: 10000
-      })
-
-      const panel = document.createElement('div')
-      Object.assign(panel.style, {
-        background: '#0b0b0b',
-        color: 'white',
-        padding: '18px',
-        borderRadius: '8px',
-        maxHeight: '80vh',
-        overflow: 'auto',
-        width: '90%',
-        maxWidth: '600px',
-        boxSizing: 'border-box'
-      })
-
-      const title = document.createElement('h2')
-      title.textContent = 'Leaderboard'
-      title.style.marginTop = '0'
-      panel.appendChild(title)
-
-      if (!Array.isArray(list) || list.length === 0) {
-        const empty = document.createElement('p')
-        empty.textContent = 'No scores yet.'
-        panel.appendChild(empty)
-      } else {
-        const ol = document.createElement('ol')
-        ol.style.paddingLeft = '18px'
-        list.forEach((entry) => {
-          const li = document.createElement('li')
-          li.style.marginBottom = '8px'
-          li.textContent = `${entry.username} — ${entry.score}`
-          ol.appendChild(li)
-        })
-        panel.appendChild(ol)
-      }
-
-      const close = document.createElement('button')
-      close.textContent = 'Close'
-      Object.assign(close.style, {
-        marginTop: '12px',
-        padding: '8px 12px',
-        cursor: 'pointer',
-        borderRadius: '6px',
-        border: 'none',
-        background: '#222',
-        color: 'white'
-      })
-      close.addEventListener('click', () => overlay.remove())
-      panel.appendChild(close)
-
-      overlay.appendChild(panel)
-      document.body.appendChild(overlay)
-    } catch (err) {
-      console.error('Could not load leaderboard:', err)
-      alert('Failed to load leaderboard.')
-    }
-  })
-}
-
-// Main menu button
-// Main menu button
-const mainBtn = document.querySelector('#mainMenuButton')
-if (mainBtn) {
-  mainBtn.addEventListener('click', () => {
+// Add restart button handler
+const restartBtn = document.querySelector('#restartButton')
+if (restartBtn) {
+  restartBtn.addEventListener('click', () => {
     audio.select.play()
     document.querySelector('#restartScreen').style.display = 'none'
-    document.querySelector('#scoreContainer').style.display = 'none'
-    game.active = false
-    game.over = true
+    document.querySelector('#scoreContainer').style.display = 'block'
 
-    // Stop background music and reset game context
-    audio.backgroundMusic.stop()
-
-    const ctx = window.__gameContext
-    if (ctx && typeof ctx.resetGame === 'function') {
-      ctx.resetGame()
-    }
+    init()
+    animate()
   })
 }
 
-addEventListener('keydown', ({ key }) => {
-  if (game.over) return
-
-  switch (key) {
-    case 'a':
-      keys.a.pressed = true
-      break
-    case 'd':
-      keys.d.pressed = true
-      break
-    case ' ':
-      keys.space.pressed = true
-
-      if (player.powerUp === 'MachineGun') return
-
-      audio.shoot.play()
-      projectiles.push(
-          new Projectile({
-            position: {
-              x: player.position.x + player.width / 2,
-              y: player.position.y
-            },
-            velocity: {
-              x: 0,
-              y: -10
-            }
-          })
-      )
-
-      break
-  }
-})
-
-addEventListener('keyup', ({ key }) => {
-  switch (key) {
-    case 'a':
-      keys.a.pressed = false
-      break
-    case 'd':
-      keys.d.pressed = false
-      break
-    case ' ':
-      keys.space.pressed = false
-
-      break
-  }
-})
+setupUIHandlers(gameState)
+setupKeyboardControls(gameState)
