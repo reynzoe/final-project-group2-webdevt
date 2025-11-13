@@ -8,7 +8,7 @@ const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 
 // Register new user
-router.post('/api/auth/register', async (req, res) => {
+router.post('/auth/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
@@ -67,7 +67,7 @@ router.post('/api/auth/register', async (req, res) => {
 });
 
 // Login
-router.post('/api/auth/login', async (req, res) => {
+router.post('/auth/login', async (req, res) => {
     try {
         const { username, password } = req.body;
 
@@ -111,7 +111,7 @@ router.post('/api/auth/login', async (req, res) => {
 });
 
 // Verify token (auto-login on page refresh)
-router.get('/api/auth/verify', authenticate, async (req, res) => {
+router.get('/auth/verify', authenticate, async (req, res) => {
     try {
         const user = await User.findById(req.user.userId).select('-passwordHash');
         if (!user) {

@@ -10,7 +10,7 @@ const router = Router();
  * - Calculates coins = floor(score / 10).
  * - Saves and returns the created score document.
  */
-router.post('/api/scores', async (req, res) => {
+router.post('/scores', async (req, res) => {
     try {
         const { username, score } = req.body ?? {};
 
@@ -42,7 +42,7 @@ router.post('/api/scores', async (req, res) => {
  * GET /api/leaderboard
  * Returns the top 10 scores sorted by highest score (then earliest createdAt for ties).
  */
-router.get('/api/leaderboard', async (_req, res) => {
+router.get('/leaderboard', async (_req, res) => {
     try {
         const top = await Score.find({})
             .sort({ score: -1, createdAt: 1 })
