@@ -14,13 +14,13 @@ const createAudio = (src, options = {}) => {
 }
 
 export const audio = {
-  backgroundMusic: createAudio(['/audio/backgroundMusic.wav'], { loop: true }),
+  backgroundMusic: createAudio(['/audio/backgroundMusic.mp3'], { loop: true }),
   bomb: createAudio(['/audio/bomb.mp3']),
   bonus: createAudio(['/audio/bonus.mp3'], { volume: 0.8 }),
   enemyShoot: createAudio(['/audio/enemyShoot.wav']),
   explode: createAudio(['/audio/explode.wav']),
   gameOver: createAudio(['/audio/gameOver.mp3']),
   select: createAudio(['/audio/select.mp3']),
-  shoot: createAudio(['/audio/shoot.wav']),
-  start: createAudio(['/audio/start.mp3'])
+  shoot: createAudio(['/audio/pew.mp3']),
+  start: createAudio(['/audio/lightsaber.mp3'])
 }
