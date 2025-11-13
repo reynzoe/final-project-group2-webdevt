@@ -1,4 +1,3 @@
-// javascript
 export class Projectile {
   constructor({ position, velocity, color = 'white', radius = 3 }) {
     this.position = { ...position }
