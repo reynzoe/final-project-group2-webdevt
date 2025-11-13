@@ -1,6 +1,6 @@
 import { Particle } from './entities/Particle'
 
-export function createParticles({ object, color = 'white', fades = false, count = 15 }, particles) {
+export function createParticles({ object, color = 'red', fades = false, count = 15 }, particles) {
   for (let i = 0; i < count; i++) {
     particles.push(
       new Particle({
@@ -51,7 +51,7 @@ export function createStarfield(canvas, particles) {
           y: 0.3
         },
         radius: Math.random() * 2,
-        color: 'white'
+        color: 'blue'
       })
     )
   }

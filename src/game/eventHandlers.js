@@ -27,7 +27,8 @@ export function setupKeyboardControls(gameState) {
             velocity: {
               x: 0,
               y: -10
-            }
+            },
+              color: 'red'
           })
         )
         break
