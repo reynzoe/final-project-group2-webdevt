@@ -11,8 +11,8 @@ const MONGO_URI = process.env.MONGO_URI
 connectDB(MONGO_URI)
 
 function start(port, allowRetry = true) {
-    const server = app.listen(port, () => {
-        console.log(`✓ Server running on http://localhost:${port}`)
+    const server = app.listen(port, '0.0.0.0', () => {
+        console.log(`✓ Server running on port ${port}`)
     })
 
     server.on('error', (err) => {
