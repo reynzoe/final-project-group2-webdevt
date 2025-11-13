@@ -4,12 +4,12 @@ const GameContext = createContext(null);
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5050';
 
 export function GameProvider({ children }) {
-    const [user, setUser] = useState(null); // { id, username, email, role, coins }
+    const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
     const [started, setStarted] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    // Auto-login on mount if token exists in localStorage
+    // Auto-login on mount
     useEffect(() => {
         const savedToken = localStorage.getItem('spaceInvadersToken');
         if (savedToken) {
@@ -17,6 +17,15 @@ export function GameProvider({ children }) {
         } else {
             setLoading(false);
         }
+    }, []);
+
+    // Listen for coins update after game ends
+    useEffect(() => {
+        function handleCoinsUpdate(event) {
+            setUser(event.detail);
+        }
+        window.addEventListener('userCoinsUpdated', handleCoinsUpdate);
+        return () => window.removeEventListener('userCoinsUpdated', handleCoinsUpdate);
     }, []);
 
     async function verifyToken(savedToken) {
@@ -87,10 +96,8 @@ export function GameProvider({ children }) {
 
     function resetGame() {
         setStarted(false);
-        // Emit a custom event so StartScreen can reset its local state
         window.dispatchEvent(new Event('gameReset'));
     }
-
 
     const value = {
         user,

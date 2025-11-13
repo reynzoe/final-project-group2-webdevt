@@ -1,23 +1,19 @@
 import { Router } from 'express';
-import { Score } from '../models/index.js';
+import { Score, User } from '../models/index.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 
 /**
  * POST /api/scores
- * Submits a player's score.
- * - Validates input.
- * - Calculates coins = floor(score / 10).
- * - Saves and returns the created score document.
+ * Submits a player's score and updates their coins.
  */
-router.post('/scores', async (req, res) => {
+router.post('/scores', authenticate, async (req, res) => {
     try {
-        const { username, score } = req.body ?? {};
+        const { score } = req.body ?? {};
+        const username = req.user.username;
 
-        // Basic validation
-        if (typeof username !== 'string' || username.trim().length < 3 || username.trim().length > 32) {
-            return res.status(400).json({ error: 'Invalid username. Must be a string between 3 and 32 characters.' });
-        }
+        // Validate score
         const parsedScore = Number(score);
         if (!Number.isFinite(parsedScore) || parsedScore < 0) {
             return res.status(400).json({ error: 'Invalid score. Must be a non-negative number.' });
@@ -25,11 +21,19 @@ router.post('/scores', async (req, res) => {
 
         const coins = Math.floor(parsedScore / 10);
 
+        // Save score
         const doc = await Score.create({
-            username: username.trim(),
+            username,
             score: parsedScore,
             coins
         });
+
+        // Update user's coins
+        await User.findByIdAndUpdate(
+            req.user.userId,
+            { $inc: { coins: coins } },
+            { new: true }
+        );
 
         return res.status(201).json(doc);
     } catch (err) {
@@ -40,7 +44,7 @@ router.post('/scores', async (req, res) => {
 
 /**
  * GET /api/leaderboard
- * Returns the top 10 scores sorted by highest score (then earliest createdAt for ties).
+ * Returns the top 10 scores sorted by highest score.
  */
 router.get('/leaderboard', async (_req, res) => {
     try {

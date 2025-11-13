@@ -24,13 +24,39 @@ export function endGame(gameState, player, canvas) {
     const { user, token } = window.__gameContext || {}
     if (user && token) {
       submitScore({ username: user.username, score: gameState.score, token })
-        .then((doc) => console.log('Score saved:', doc))
-        .catch((err) => console.error('Failed to save score:', err))
+          .then(async (doc) => {
+            console.log('Score saved:', doc)
+
+            // Display earned coins
+            const coinsEarned = doc.coins || 0
+            const coinsEl = document.querySelector('#coinsEarned')
+            if (coinsEl) {
+              coinsEl.innerHTML = `+${coinsEarned} coins earned!`
+              coinsEl.style.display = 'block'
+            }
+
+            // Fetch updated user data
+            const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5050'
+            const res = await fetch(`${API_BASE}/api/auth/verify`, {
+              headers: { Authorization: `Bearer ${token}` }
+            })
+            if (res.ok) {
+              const data = await res.json()
+              // Dispatch event with updated user
+              window.dispatchEvent(new CustomEvent('userCoinsUpdated', { detail: data.user }))
+            }
+          })
+          .catch((err) => console.error('Failed to save score:', err))
+    } else {
+      const coinsEl = document.querySelector('#coinsEarned')
+      if (coinsEl) coinsEl.style.display = 'none'
     }
   }, 2000)
 
   createParticles({ object: player, color: 'white', fades: true }, gameState.particles)
 }
+
+
 
 export function spawnPowerUps(gameState, canvas) {
   if (gameState.frames % 500 === 0) {

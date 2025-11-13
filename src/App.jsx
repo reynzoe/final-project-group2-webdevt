@@ -46,27 +46,37 @@ function AppContent() {
             <StartScreen />
 
             {/* Restart screen */}
-            <div
-                id="restartScreen"
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    left: 0,
-                    background: 'url(/img/startScreenBackground.png)',
-                    zIndex: 20,
-                    backgroundSize: 'contain',
-                    backgroundRepeat: 'no-repeat',
-                    display: 'none',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}
+            <div id="restartScreen"
+                 style={{
+                     position: 'absolute',
+                     top: 0,
+                     right: 0,
+                     bottom: 0,
+                     left: 0,
+                     background: 'url(/img/startScreenBackground.png)',
+                     zIndex: 20,
+                     backgroundSize: 'contain',
+                     backgroundRepeat: 'no-repeat',
+                     display: 'none',
+                     alignItems: 'center',
+                     justifyContent: 'center'
+                 }}
             >
                 <div style={{ textAlign: 'center' }}>
                     <h1 style={{ color: 'white', fontSize: 24 }}>Game Over</h1>
                     <h1 id="finalScore" style={{ color: 'white', margin: 0, fontSize: 48 }}>0</h1>
                     <p style={{ color: 'white', marginTop: 0 }}>Points</p>
+
+                    {/* Coins earned display */}
+                    <p id="coinsEarned" style={{
+                        color: '#ffd700',
+                        fontSize: 18,
+                        margin: '10px 0',
+                        display: 'none',
+                        fontWeight: 'bold'
+                    }}>
+                        +0 coins earned!
+                    </p>
 
                     <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 12 }}>
                         <div
@@ -83,8 +93,8 @@ function AppContent() {
                                     transform: 'translate(-50%, -50%)'
                                 }}
                             >
-          Restart
-        </span>
+                                Restart
+                            </span>
                         </div>
 
                         <button
