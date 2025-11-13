@@ -28,7 +28,7 @@ export function setupKeyboardControls(gameState) {
               x: 0,
               y: -10
             },
-              color: 'red'
+              color: 'lightblue'
           })
         )
         break

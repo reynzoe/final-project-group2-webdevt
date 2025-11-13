@@ -1,13 +1,20 @@
-// javascript
+import gsap from 'gsap'
+import { audio } from '../audio'
+
 export class Bomb {
-  static radius = 20
+  static radius = 30
 
   constructor({ position, velocity }) {
     this.position = { ...position }
     this.velocity = { ...velocity }
-    this.radius = Bomb.radius
+    this.radius = 0
+    this.color = 'red'
     this.opacity = 1
     this.active = false
+
+    gsap.to(this, {
+      radius: 30
+    })
   }
 
   draw(ctx) {
@@ -17,13 +24,10 @@ export class Bomb {
     c.globalAlpha = this.opacity
     c.beginPath()
     c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2)
-    c.fillStyle = this.active ? 'orange' : 'red'
+    c.closePath()
+    c.fillStyle = this.color
     c.fill()
     c.restore()
-  }
-
-  explode() {
-    this.active = true
   }
 
   update() {
@@ -33,12 +37,35 @@ export class Bomb {
 
     const canvas = document.querySelector('canvas')
     if (canvas) {
-      if (this.position.x - this.radius <= 0 || this.position.x + this.radius >= canvas.width)
-        this.velocity.x *= -1
-      if (this.position.y - this.radius <= 0 || this.position.y + this.radius >= canvas.height)
-        this.velocity.y *= -1
+      if (
+          this.position.x + this.radius + this.velocity.x >= canvas.width ||
+          this.position.x - this.radius + this.velocity.x <= 0
+      ) {
+        this.velocity.x = -this.velocity.x
+      } else if (
+          this.position.y + this.radius + this.velocity.y >= canvas.height ||
+          this.position.y - this.radius + this.velocity.y <= 0
+      ) {
+        this.velocity.y = -this.velocity.y
+      }
     }
+  }
 
-    if (this.active) this.opacity = Math.max(0, this.opacity - 0.02)
+  explode() {
+    audio.bomb.play()
+    this.active = true
+    this.velocity.x = 0
+    this.velocity.y = 0
+
+    gsap.to(this, {
+      radius: 200,
+      color: 'white'
+    })
+
+    gsap.to(this, {
+      delay: 0.1,
+      opacity: 0,
+      duration: 0.15
+    })
   }
 }
