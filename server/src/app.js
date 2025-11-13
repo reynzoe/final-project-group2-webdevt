@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import leaderboardRoutes from './routes/leaderboard.routes.js';
 import authRoutes from './routes/auth.routes.js';
+import adminRoutes from './routes/admin.routes.js';
+
 
 const app = express();
 
@@ -17,6 +19,8 @@ app.use(cors({
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+app.use('/api', adminRoutes);
 
 app.use(express.json());
 

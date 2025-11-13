@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '../contexts/GameContext';
 import '../../styles/startScreen.css';
+import AdminDashboard from './AdminDashboard';
+
 
 function LeaderboardModal({ onClose }) {
     const [rows, setRows] = useState([]);
@@ -143,26 +145,30 @@ export default function StartScreen() {
     // If user is logged in, show logged-in screen
     if (user) {
         return (
-            <div className="react-start-screen">
-                <div className="react-start-card">
-                    <h1 className="react-start-title">Welcome, {user.username}!</h1>
-                    <p style={{ color: '#fff', marginBottom: 16 }}>
-                        Coins: {user.coins} | Role: {user.role}
-                    </p>
-                    <button className="react-start-button" onClick={handleStartGame}>
-                        🚀 START GAME
-                    </button>
-                    <button className="react-link-button" onClick={() => setShowLeaderboard(true)}>
-                        🏆 View Leaderboard
-                    </button>
-                    <button className="react-link-button" onClick={handleLogout}>
-                        🚪 Logout
-                    </button>
+            <>
+                <div className="react-start-screen">
+                    <div className="react-start-card">
+                        <h1 className="react-start-title">Welcome, {user.username}!</h1>
+                        <p style={{ color: '#fff', marginBottom: 16 }}>
+                            Coins: {user.coins} | Role: {user.role}
+                        </p>
+                        <button className="react-start-button" onClick={handleStartGame}>
+                            🚀 START GAME
+                        </button>
+                        <button className="react-link-button" onClick={() => setShowLeaderboard(true)}>
+                            🏆 View Leaderboard
+                        </button>
+                        <button className="react-link-button" onClick={handleLogout}>
+                            🚪 Logout
+                        </button>
+                    </div>
+                    {showLeaderboard && <LeaderboardModal onClose={() => setShowLeaderboard(false)} />}
                 </div>
-                {showLeaderboard && <LeaderboardModal onClose={() => setShowLeaderboard(false)} />}
-            </div>
+                {user.role === 'admin' && <AdminDashboard />}
+            </>
         );
     }
+
 
     return (
         <div className="react-start-screen">

@@ -82,10 +82,16 @@ router.post('/auth/login', async (req, res) => {
         }
 
         // Compare password
+        if (user.role === 'banned') {
+            return res.status(403).json({ error: 'Your account has been banned' });
+        }
+
         const isMatch = await bcrypt.compare(password, user.passwordHash);
+
         if (!isMatch) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
+
 
         // Generate JWT
         const token = jwt.sign(

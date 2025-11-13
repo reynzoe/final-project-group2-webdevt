@@ -24,7 +24,7 @@ const UserSchema = new Schema(
         // Store a hash, not a raw password
         passwordHash: { type: String, required: true },
 
-        role: { type: String, enum: ['player', 'admin'], default: 'player', index: true },
+        role: { type: String, enum: ['player', 'admin', 'banned'], default: 'player', index: true },
 
         coins: { type: Number, default: 0, min: 0 },
 
