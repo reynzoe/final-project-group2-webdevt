@@ -143,31 +143,53 @@ export default function StartScreen() {
     }
 
     // If user is logged in, show logged-in screen
+// If user is logged in, show logged-in screen
     if (user) {
         return (
             <>
-                <div className="react-start-screen">
-                    <div className="react-start-card">
-                        <h1 className="react-start-title">Welcome, {user.username}!</h1>
-                        <p style={{ color: '#fff', marginBottom: 16 }}>
-                            Coins: {user.coins} | Role: {user.role}
-                        </p>
-                        <button className="react-start-button" onClick={handleStartGame}>
-                            🚀 START GAME
-                        </button>
-                        <button className="react-link-button" onClick={() => setShowLeaderboard(true)}>
-                            🏆 View Leaderboard
-                        </button>
-                        <button className="react-link-button" onClick={handleLogout}>
-                            🚪 Logout
-                        </button>
-                    </div>
-                    {showLeaderboard && <LeaderboardModal onClose={() => setShowLeaderboard(false)} />}
-                </div>
-                {user.role === 'admin' && <AdminDashboard />}
+                {user.role === 'admin' ? (
+                    // Show admin dashboard instead of regular start screen
+                    <>
+                        <div className="react-start-screen">
+                            <div className="react-start-card">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                                    <h1 className="react-start-title" style={{ margin: 0 }}>Admin Panel</h1>
+                                    <button className="react-start-button" onClick={handleLogout} style={{ padding: '8px 16px' }}>
+                                        🚪 Logout
+                                    </button>
+                                </div>
+                                <AdminDashboard />
+                            </div>
+                        </div>
+                        {showLeaderboard && <LeaderboardModal onClose={() => setShowLeaderboard(false)} />}
+                    </>
+                ) : (
+                    // Regular player screen
+                    <>
+                        <div className="react-start-screen">
+                            <div className="react-start-card">
+                                <h1 className="react-start-title">Welcome, {user.username}!</h1>
+                                <p style={{ color: '#fff', marginBottom: 16 }}>
+                                    Coins: {user.coins} | Role: {user.role}
+                                </p>
+                                <button className="react-start-button" onClick={handleStartGame}>
+                                    🚀 START GAME
+                                </button>
+                                <button className="react-link-button" onClick={() => setShowLeaderboard(true)}>
+                                    🏆 View Leaderboard
+                                </button>
+                                <button className="react-link-button" onClick={handleLogout}>
+                                    🚪 Logout
+                                </button>
+                            </div>
+                        </div>
+                        {showLeaderboard && <LeaderboardModal onClose={() => setShowLeaderboard(false)} />}
+                    </>
+                )}
             </>
         );
     }
+
 
 
     return (
