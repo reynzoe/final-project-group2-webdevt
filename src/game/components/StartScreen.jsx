@@ -1,3 +1,4 @@
+// javascript
 import React, { useState, useEffect } from 'react';
 import { useGame } from '../contexts/GameContext';
 import '../../styles/startScreen.css';
@@ -85,6 +86,16 @@ export default function StartScreen() {
         return () => window.removeEventListener('gameReset', handleReset);
     }, []);
 
+    // Clear auth fields whenever switching between auth stages
+    useEffect(() => {
+        if (stage === 'login' || stage === 'register' || stage === 'welcome') {
+            setUsername('');
+            setEmail('');
+            setPassword('');
+            setError('');
+        }
+    }, [stage]);
+
     async function handleRegister() {
         try {
             setError('');
@@ -144,12 +155,10 @@ export default function StartScreen() {
     }
 
     // If user is logged in, show logged-in screen
-// If user is logged in, show logged-in screen
     if (user) {
         return (
             <>
                 {user.role === 'admin' ? (
-                    // Show admin dashboard instead of regular start screen
                     <>
                         <div className="react-start-screen">
                             <div className="react-start-card">
@@ -165,7 +174,6 @@ export default function StartScreen() {
                         {showLeaderboard && <LeaderboardModal onClose={() => setShowLeaderboard(false)} />}
                     </>
                 ) : (
-                    // Regular player screen
                     <>
                         <div className="react-start-screen">
                             <div className="react-start-card">
@@ -194,8 +202,6 @@ export default function StartScreen() {
             </>
         );
     }
-
-
 
     return (
         <div className="react-start-screen">
@@ -229,6 +235,7 @@ export default function StartScreen() {
                             placeholder="player123"
                             maxLength={32}
                             autoFocus
+                            autoComplete="username"
                         />
                         <label className="react-start-label">Email:</label>
                         <input
@@ -237,6 +244,7 @@ export default function StartScreen() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="you@example.com"
+                            autoComplete="email"
                         />
                         <label className="react-start-label">Password:</label>
                         <input
@@ -246,6 +254,7 @@ export default function StartScreen() {
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
                             onKeyDown={(e) => e.key === 'Enter' && handleRegister()}
+                            autoComplete="new-password"
                         />
                         {error && <div className="react-error">{error}</div>}
                         <div className="button-group" style={{ gap: 8, display: 'flex', flexWrap: 'wrap' }}>
@@ -268,6 +277,7 @@ export default function StartScreen() {
                             onChange={(e) => setUsername(e.target.value)}
                             placeholder="player123"
                             autoFocus
+                            autoComplete="username"
                         />
                         <label className="react-start-label">Password:</label>
                         <input
@@ -277,6 +287,7 @@ export default function StartScreen() {
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
                             onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                            autoComplete="current-password"
                         />
                         {error && <div className="react-error">{error}</div>}
                         <div className="button-group" style={{ gap: 8, display: 'flex', flexWrap: 'wrap' }}>
