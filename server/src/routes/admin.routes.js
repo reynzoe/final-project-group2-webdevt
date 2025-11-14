@@ -71,4 +71,21 @@ router.put('/admin/users/:id/ban', authenticate, isAdmin, async (req, res) => {
     }
 });
 
+router.put('/admin/users/:id/unban', authenticate, isAdmin, async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { role: 'player' },
+            { new: true }
+        ).select('-passwordHash');
+
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json({ message: 'User unbanned', user });
+    } catch (err) {
+        console.error('Failed to unban user:', err);
+        res.status(500).json({ error: 'Failed to unban user' });
+    }
+});
+
 export default router;
+

@@ -68,6 +68,7 @@ export default function AdminDashboard() {
         }
     }
 
+
     async function deleteScore(id) {
         if (!confirm('Delete this score?')) return;
         try {
@@ -80,6 +81,21 @@ export default function AdminDashboard() {
             }
         } catch (err) {
             console.error('Failed to delete score:', err);
+        }
+    }
+
+    async function unbanUser(id) {
+        if (!confirm('Unban this user?')) return;
+        try {
+            const res = await fetch(`${API_BASE}/api/admin/users/${id}/unban`, {
+                method: 'PUT',
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) {
+                setUsers(users.map((u) => (u._id === id ? { ...u, role: 'player' } : u)));
+            }
+        } catch (err) {
+            console.error('Failed to unban user:', err);
         }
     }
 
@@ -110,9 +126,11 @@ export default function AdminDashboard() {
                             <td style={{ padding: 8 }}>{u.role}</td>
                             <td style={{ padding: 8 }}>{u.coins}</td>
                             <td style={{ padding: 8, textAlign: 'right' }}>
-                                <button onClick={() => banUser(u._id)} disabled={u.role === 'banned'}>
-                                    {u.role === 'banned' ? 'Banned' : 'Ban'}
-                                </button>
+                                {u.role === 'banned' ? (
+                                    <button onClick={() => unbanUser(u._id)}>Unban</button>
+                                ) : (
+                                    <button onClick={() => banUser(u._id)}>Ban</button>
+                                )}
                                 {' '}
                                 <button onClick={() => deleteUser(u._id)}>Delete</button>
                             </td>
