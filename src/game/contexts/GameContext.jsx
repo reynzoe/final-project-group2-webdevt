@@ -99,6 +99,30 @@ export function GameProvider({ children }) {
         window.dispatchEvent(new Event('gameReset'));
     }
 
+    async function purchaseProjectileColor(color) {
+        const res = await fetch(`${API_BASE}/api/shop/projectile-color/purchase`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ color })
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'Purchase failed')
+        await verifyToken(token)
+        return data
+    }
+
+    async function equipProjectileColor(color) {
+        const res = await fetch(`${API_BASE}/api/shop/projectile-color/equip`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ color })
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'Equip failed')
+        await verifyToken(token)
+        return data
+    }
+
     const value = {
         user,
         token,
@@ -108,7 +132,9 @@ export function GameProvider({ children }) {
         login,
         logout,
         startGame,
-        resetGame
+        resetGame,
+        purchaseProjectileColor,
+        equipProjectileColor
     };
 
     useEffect(() => {

@@ -12,26 +12,28 @@ export function setupKeyboardControls(gameState) {
       case 'd':
         gameState.keys.d.pressed = true
         break
-      case ' ':
-        gameState.keys.space.pressed = true
+        case ' ':
+            gameState.keys.space.pressed = true
 
-        if (!gameState.player || gameState.player.powerUp === 'MachineGun') return
+            if (!gameState.player || gameState.player.powerUp === 'MachineGun') return
 
-        audio.shoot.play()
-        gameState.projectiles.push(
-          new Projectile({
-            position: {
-              x: gameState.player.position.x + gameState.player.width / 2,
-              y: gameState.player.position.y
-            },
-            velocity: {
-              x: 0,
-              y: -10
-            },
-              color: 'lightblue'
-          })
-        )
-        break
+            audio.shoot.play()
+
+            const { user } = window.__gameContext || {}
+            const projColor = user?.projectile?.equippedColor || 'lightblue'
+
+            gameState.projectiles.push(
+                new Projectile({
+                    position: {
+                        x: gameState.player.position.x + gameState.player.width / 2,
+                        y: gameState.player.position.y
+                    },
+                    velocity: { x: 0, y: -10 },
+                    color: projColor
+                })
+            )
+            break
+
     }
   })
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGame } from '../contexts/GameContext';
 import '../../styles/startScreen.css';
 import AdminDashboard from './AdminDashboard';
-
+import Shop from './Shop';
 
 function LeaderboardModal({ onClose }) {
     const [rows, setRows] = useState([]);
@@ -74,6 +74,7 @@ export default function StartScreen() {
     const [error, setError] = useState('');
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [guestPlaying, setGuestPlaying] = useState(false);
+    const [showShop, setShowShop] = useState(false);
 
     // Listen for game reset event
     useEffect(() => {
@@ -178,12 +179,16 @@ export default function StartScreen() {
                                 <button className="react-link-button" onClick={() => setShowLeaderboard(true)}>
                                     🏆 View Leaderboard
                                 </button>
+                                <button className="react-link-button" onClick={() => setShowShop(true)}>
+                                    🛒 Shop
+                                </button>
                                 <button className="react-link-button" onClick={handleLogout}>
                                     🚪 Logout
                                 </button>
                             </div>
                         </div>
                         {showLeaderboard && <LeaderboardModal onClose={() => setShowLeaderboard(false)} />}
+                        {showShop && <Shop onClose={() => setShowShop(false)} />}
                     </>
                 )}
             </>

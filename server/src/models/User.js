@@ -21,6 +21,12 @@ const UserSchema = new Schema(
             lowercase: true,
             match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         },
+
+        projectile: {
+            ownedColors: { type: [String], default: ['lightblue'] },
+            equippedColor: { type: String, default: 'lightblue' }
+        },
+
         // Store a hash, not a raw password
         passwordHash: { type: String, required: true },
 

@@ -1,9 +1,10 @@
+// javascript
 import express from 'express';
 import cors from 'cors';
 import leaderboardRoutes from './routes/leaderboard.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import adminRoutes from './routes/admin.routes.js';
-
+import shopRoutes from './routes/shop.routes.js';
 
 const app = express();
 
@@ -20,18 +21,19 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use('/api', adminRoutes);
-
 app.use(express.json());
 
 app.get('/health', (req, res) => {
     res.json({ ok: true });
 });
 
-// Add /api prefix to all routes
+// Routes under /api
 app.use('/api', authRoutes);
 app.use('/api', leaderboardRoutes);
+app.use('/api', adminRoutes);
+app.use('/api', shopRoutes);
 
+// 404 and error handlers
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 app.use((err, req, res, next) => {
     console.error(err);

@@ -15,6 +15,7 @@ import {
 } from './gameLogic'
 import { setupKeyboardControls, setupUIHandlers } from './eventHandlers'
 
+
 const scoreEl = document.querySelector('#scoreEl')
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
@@ -124,18 +125,17 @@ function handleMachineGun() {
     !gameState.game.over
   ) {
     if (gameState.frames % 6 === 0) audio.shoot.play()
+    const { user } = window.__gameContext || {}
+    const projColor = user?.projectile?.equippedColor || 'lightblue'
     gameState.projectiles.push(
-      new Projectile({
-        position: {
-          x: gameState.player.position.x + gameState.player.width / 2,
-          y: gameState.player.position.y
-        },
-        velocity: {
-          x: 0,
-          y: -10
-        },
-        color: 'yellow'
-      })
+        new Projectile({
+          position: {
+            x: gameState.player.position.x + gameState.player.width / 2,
+            y: gameState.player.position.y
+          },
+          velocity: { x: 0, y: -10 },
+          color: projColor
+        })
     )
   }
 }

@@ -20,7 +20,7 @@ export const audio = {
   enemyShoot: createAudio(['/audio/enemyShoot.wav']),
   explode: createAudio(['/audio/explode.wav']),
   gameOver: createAudio(['/audio/gameOver.mp3']),
-  select: createAudio(['/audio/select.mp3']),
+  select: createAudio(['/audio/lightsaber.mp3']),
   shoot: createAudio(['/audio/pew.mp3']),
   start: createAudio(['/audio/lightsaber.mp3'])
 }
