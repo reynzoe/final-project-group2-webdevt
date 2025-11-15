@@ -1,140 +1,116 @@
-// File: src/App.jsx
+// File: src/App.jsx (Retro Arcade Tailwind Version)
 import React, { useEffect, useRef } from 'react'
 import './index.css'
 import { GameProvider } from './game/contexts/GameContext'
 import StartScreen from './game/components/StartScreen'
 
 function AppContent() {
-    const canvasRef = useRef(null)
+  const canvasRef = useRef(null)
 
-    useEffect(() => {
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+
+    import('./game/index.js').catch((e) => {
+      console.error('Failed to load game module:', e)
+    })
+  }, [])
+
+  useEffect(() => {
+    const handleResize = () => {
         const canvas = canvasRef.current
-        if (!canvas) return
-        canvas.width = 1024
-        canvas.height = 576
+        if (canvas) {
+            canvas.width = window.innerWidth
+            canvas.height = window.innerHeight
+        }
+    }
 
-        import('./game/index.js').catch((e) => {
-            console.error('Failed to load game module:', e)
-        })
-    }, [])
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
-    return (
-        <div id="parentDiv" style={{ position: 'relative' }}>
-            <p
-                id="scoreContainer"
-                style={{
-                    position: 'absolute',
-                    zIndex: 10,
-                    color: 'white',
-                    left: 10,
-                    top: 10,
-                    margin: 0,
-                    display: 'none'
-                }}
+  return (
+<div id="parentDiv" className="relative w-full h-full font-arcade select-none overflow-hidden">
+      {/* Score */}
+      <p
+        id="scoreContainer"
+        className="absolute z-20 text-white left-3 top-3 m-0 hidden text-xl drop-shadow-[0_0_6px_#00f]"
+      >
+        <span>Score:</span> <span id="scoreEl">0</span>
+      </p>
+
+    
+
+      {/* Canvas */}
+      <canvas ref={canvasRef} className="" />
+
+      {/* Required hidden original DOM elements */}
+      <div id="startScreen" className="hidden">
+        <div id="startButton"></div>
+      </div>
+
+      {/* React Start Screen */}
+      <StartScreen />
+
+      {/* Restart Screen */}
+      <div
+        id="restartScreen"
+        className="hidden absolute inset-0 z-30 bg-[url('/img/startScreenBackground.png')] bg-no-repeat bg-contain flex items-center justify-center"
+      >
+        <div className="text-center">
+          <h1 className="text-white text-3xl drop-shadow-[0_0_8px_#f00]">Game Over</h1>
+          <h1 id="finalScore" className="text-white text-6xl mt-2 drop-shadow-[0_0_10px_#ff0]">0</h1>
+          <p className="text-white text-lg -mt-2">Points</p>
+
+          <p
+            id="coinsEarned"
+            className="text-yellow-400 text-xl font-bold my-2 hidden drop-shadow-[0_0_6px_#ff0]"
+          >
+            +0 coins earned!
+          </p>
+
+          <div className="flex gap-4 justify-center mt-4">
+            {/* Restart Button */}
+            <div
+              id="restartButton"
+              className="relative cursor-pointer inline-block hover:scale-105 transition-transform"
             >
-                <span>Score:</span> <span id="scoreEl">0</span>
-            </p>
-
-            <canvas ref={canvasRef} />
-
-            {/* Original DOM start screen (hidden, but game code needs it) */}
-            <div id="startScreen" style={{ display: 'none' }}>
-                <div id="startButton"></div>
+              <img src="/img/button.png" alt="Restart Button" />
+              <span className="absolute text-white top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_0_5px_#000]">
+                Restart
+              </span>
             </div>
 
-            {/* React start screen overlay */}
-            <StartScreen />
-
-            {/* Restart screen */}
-            <div id="restartScreen"
-                 style={{
-                     position: 'absolute',
-                     top: 0,
-                     right: 0,
-                     bottom: 0,
-                     left: 0,
-                     background: 'url(/img/startScreenBackground.png)',
-                     zIndex: 20,
-                     backgroundSize: 'contain',
-                     backgroundRepeat: 'no-repeat',
-                     display: 'none',
-                     alignItems: 'center',
-                     justifyContent: 'center'
-                 }}
+            {/* Leaderboard */}
+            <button
+              id="viewLeaderboardButton"
+              className="px-3 py-2 bg-black/70 text-white border border-blue-500 rounded-lg cursor-pointer
+                         hover:bg-blue-700/40 hover:scale-105 transition-all"
             >
-                <div style={{ textAlign: 'center' }}>
-                    <h1 style={{ color: 'white', fontSize: 24 }}>Game Over</h1>
-                    <h1 id="finalScore" style={{ color: 'white', margin: 0, fontSize: 48 }}>0</h1>
-                    <p style={{ color: 'white', marginTop: 0 }}>Points</p>
+              View Leaderboard
+            </button>
 
-                    {/* Coins earned display */}
-                    <p id="coinsEarned" style={{
-                        color: '#ffd700',
-                        fontSize: 18,
-                        margin: '10px 0',
-                        display: 'none',
-                        fontWeight: 'bold'
-                    }}>
-                        +0 coins earned!
-                    </p>
-
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 12 }}>
-                        <div
-                            id="restartButton"
-                            style={{ cursor: 'pointer', position: 'relative', display: 'inline-block' }}
-                        >
-                            <img src="/img/button.png" alt="Restart Button" />
-                            <span
-                                style={{
-                                    position: 'absolute',
-                                    color: 'white',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)'
-                                }}
-                            >
-                                Restart
-                            </span>
-                        </div>
-
-                        <button
-                            id="viewLeaderboardButton"
-                            style={{
-                                padding: '8px 12px',
-                                background: '#222',
-                                color: 'white',
-                                border: '1px solid #444',
-                                borderRadius: 6,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            View Leaderboard
-                        </button>
-
-                        <button
-                            id="mainMenuButton"
-                            style={{
-                                padding: '8px 12px',
-                                background: '#222',
-                                color: 'white',
-                                border: '1px solid #444',
-                                borderRadius: 6,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Main Menu
-                        </button>
-                    </div>
-                </div>
-            </div>
+            {/* Main Menu */}
+            <button
+              id="mainMenuButton"
+              className="px-3 py-2 bg-black/70 text-white border border-pink-500 rounded-lg cursor-pointer
+                         hover:bg-pink-700/40 hover:scale-105 transition-all"
+            >
+              Main Menu
+            </button>
+          </div>
         </div>
-    )
+      </div>
+    </div>
+  )
 }
 
 export default function App() {
-    return (
-        <GameProvider>
-            <AppContent />
-        </GameProvider>
-    )
+  return (
+    <GameProvider>
+      <AppContent />
+    </GameProvider>
+  )
 }
