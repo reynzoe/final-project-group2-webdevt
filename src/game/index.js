@@ -4,7 +4,7 @@ import { Projectile } from './entities/Projectile'
 import { rectangularCollision } from './util'
 import { audio } from './audio'
 import { GameState } from './gameState'
-import { createParticles, createStarfield } from './effects'
+import { createStarfield } from './effects'
 import {
   spawnPowerUps,
   spawnBombs,
@@ -15,16 +15,19 @@ import {
 } from './gameLogic'
 import { setupKeyboardControls, setupUIHandlers } from './eventHandlers'
 
-
-const scoreEl = document.querySelector('#scoreEl')
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
-canvas.width = 1024
-canvas.height = 576
-
 const gameState = new GameState()
 let animationId = null
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
+}
+
+resizeCanvas()
+window.addEventListener('resize', resizeCanvas)
 
 function init() {
   gameState.reset()
@@ -119,10 +122,10 @@ function handlePlayerMovement(canvas) {
 
 function handleMachineGun() {
   if (
-    gameState.keys.space.pressed &&
-    gameState.player.powerUp === 'MachineGun' &&
-    gameState.frames % 2 === 0 &&
-    !gameState.game.over
+      gameState.keys.space.pressed &&
+      gameState.player.powerUp === 'MachineGun' &&
+      gameState.frames % 2 === 0 &&
+      !gameState.game.over
   ) {
     if (gameState.frames % 6 === 0) audio.shoot.play()
     const { user } = window.__gameContext || {}
@@ -192,7 +195,6 @@ document.querySelector('#startButton').addEventListener('click', () => {
   animate()
 })
 
-// Add restart button handler
 const restartBtn = document.querySelector('#restartButton')
 if (restartBtn) {
   restartBtn.addEventListener('click', () => {
