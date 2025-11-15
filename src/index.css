@@ -1,16 +1,13 @@
+@import "tailwindcss";
 html, body, #root {
   height: 100%;
-}
-body {
   margin: 0;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #000;
-  font-family: sans-serif;
-  font-size: 14px;
+  padding: 0;
 }
+
+
+
+
 canvas {
   display: block;
 }
