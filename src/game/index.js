@@ -36,7 +36,28 @@ function init() {
   document.querySelector('#finalScore').innerHTML = gameState.score
   document.querySelector('#scoreEl').innerHTML = gameState.score
 
+  // populate HUD with current user/context if available
+  try {
+    const ctx = window.__gameContext || {}
+    const user = ctx.user || {}
+    const hudUsername = document.querySelector('#hudUsername')
+    const hudCoins = document.querySelector('#hudCoins')
+    const hudSkin = document.querySelector('#hudSkin')
+    const hudSwatch = document.querySelector('#hudProjectileSwatch')
+    if (hudUsername) hudUsername.innerText = user.username || 'guest'
+    if (hudCoins) hudCoins.innerText = typeof user.coins === 'number' ? user.coins : 0
+    if (hudSkin) hudSkin.innerText = user?.skin?.equipped || user?.skin || 'default'
+    if (hudSwatch) hudSwatch.style.background = (user?.projectile?.equippedColor) || 'lightblue'
+  } catch (e) {
+    // ignore
+  }
+
   createStarfield(canvas, gameState.particles)
+  // HUD lives if available on player
+  try {
+    const hudLives = document.querySelector('#hudLives')
+    if (hudLives) hudLives.innerText = (gameState.player && typeof gameState.player.lives === 'number') ? gameState.player.lives : '-'
+  } catch (e) {}
 }
 
 function updatePowerUps(canvas) {
@@ -191,8 +212,59 @@ document.querySelector('#startButton').addEventListener('click', () => {
   document.querySelector('#startScreen').style.display = 'none'
   document.querySelector('#scoreContainer').style.display = 'block'
 
+  // update HUD again on start
+  try {
+    const ctx = window.__gameContext || {}
+    const user = ctx.user || {}
+    const hudUsername = document.querySelector('#hudUsername')
+    const hudCoins = document.querySelector('#hudCoins')
+    const hudSkin = document.querySelector('#hudSkin')
+    const hudSwatch = document.querySelector('#hudProjectileSwatch')
+    if (hudUsername) hudUsername.innerText = user.username || 'guest'
+    if (hudCoins) hudCoins.innerText = typeof user.coins === 'number' ? user.coins : 0
+    if (hudSkin) hudSkin.innerText = user?.skin?.equipped || user?.skin || 'default'
+    if (hudSwatch) hudSwatch.style.background = (user?.projectile?.equippedColor) || 'lightblue'
+    const hudLives = document.querySelector('#hudLives')
+    if (hudLives) hudLives.innerText = (gameState.player && typeof gameState.player.lives === 'number') ? gameState.player.lives : hudLives.innerText
+  } catch (e) {}
+
   init()
   animate()
+})
+
+// Update HUD when user data changes (dispatched by GameContext)
+window.addEventListener('userCoinsUpdated', (e) => {
+  try {
+    const user = e.detail || window.__gameContext?.user || {}
+    const hudUsername = document.querySelector('#hudUsername')
+    const hudCoins = document.querySelector('#hudCoins')
+    const hudSkin = document.querySelector('#hudSkin')
+    const hudSwatch = document.querySelector('#hudProjectileSwatch')
+    const hudSkinImg = document.querySelector('#hudSkinImg')
+    const hudRole = document.querySelector('#hudRole')
+    if (hudUsername) hudUsername.innerText = user.username || 'guest'
+    if (hudCoins) {
+      const newVal = typeof user.coins === 'number' ? user.coins : hudCoins.innerText
+      // animate when coins increase
+      try {
+        if (Number(newVal) > Number(hudCoins.innerText || 0)) {
+          hudCoins.classList.add('hud-coin-bump')
+          hudCoins.addEventListener('animationend', () => hudCoins.classList.remove('hud-coin-bump'), { once: true })
+        }
+      } catch (e) {}
+      hudCoins.innerText = newVal
+    }
+    if (hudSkin) hudSkin.innerText = user?.skin?.equipped || user?.skin || hudSkin.innerText
+    if (hudSwatch) hudSwatch.style.background = (user?.projectile?.equippedColor) || hudSwatch.style.background
+    if (hudSkinImg) {
+      const skinImage = user?.skin?.image || user?.skinImage || null
+      if (skinImage) hudSkinImg.src = skinImage
+      else hudSkinImg.src = '/img/spaceship.png'
+    }
+    if (hudRole) hudRole.innerText = user.role || 'player'
+  } catch (err) {
+    // ignore
+  }
 })
 
 const restartBtn = document.querySelector('#restartButton')
