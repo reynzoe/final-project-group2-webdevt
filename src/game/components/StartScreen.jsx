@@ -227,9 +227,17 @@ export default function StartScreen() {
       return
     }
 
-    // logged-in user flow: call context startGame then click the DOM start button
-    if (typeof startGame === 'function') startGame()
-    if (startButton) startButton.click()
+    // logged-in user flow: only start if there's a logged in user
+    if (user) {
+      if (typeof startGame === 'function') startGame()
+      if (startButton) startButton.click()
+      return
+    }
+
+    // Not logged in and not playing as guest: close intro and open login/register
+    setShowCrawl(false)
+    setShowBegin(false)
+    setStage('login')
   }
 
   function handleLogout() {
@@ -315,7 +323,8 @@ export default function StartScreen() {
       <div className="ss-stars" aria-hidden="true" />
       <div className="ss-stars-2" aria-hidden="true" />
 
-      <div className="ss-card p-6">
+      <div className="ss-card">
+        <div className="ss-card-inner">
         <div className="ss-header mb-4">
           <img src="/img/spaceship.png" alt="logo" className="ss-logo" />
           <h1 className="ss-title">Star Killer</h1>
@@ -334,7 +343,7 @@ export default function StartScreen() {
         )}
 
         {stage === 'register' && (
-          <div className="mt-4 text-left">
+          <div className="ss-form">
             <label className="block text-sm text-slate-300 mb-1">Username:</label>
             <input
               className="w-full bg-[#0b0b0f] border border-blue-800 rounded-md px-3 py-2 text-white placeholder:text-slate-400 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -369,7 +378,7 @@ export default function StartScreen() {
 
             {error && <div className="text-red-400 mb-3">{error}</div>}
 
-            <div className="flex gap-2 flex-wrap">
+            <div className="ss-actions">
               <button className="ss-btn ss-btn-primary" onClick={handleRegister}>✅ Register</button>
               <button className="ss-btn ss-btn-ghost" onClick={() => setStage('welcome')}>← Back</button>
             </div>
@@ -377,7 +386,7 @@ export default function StartScreen() {
         )}
 
         {stage === 'login' && (
-          <div className="mt-4 text-left">
+          <div className="ss-form">
             <label className="block text-sm text-slate-300 mb-1">Username:</label>
             <input
               className="w-full bg-[#0b0b0f] border border-blue-800 rounded-md px-3 py-2 text-white placeholder:text-slate-400 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -401,15 +410,16 @@ export default function StartScreen() {
 
             {error && <div className="text-red-400 mb-3">{error}</div>}
 
-            <div className="flex gap-2 flex-wrap">
+            <div className="ss-actions">
               <button className="ss-btn ss-btn-primary" onClick={handleLogin}>🔒 Login</button>
               <button className="ss-btn ss-btn-ghost" onClick={() => setStage('welcome')}>← Back</button>
             </div>
           </div>
         )}
       </div>
-
-      {showLeaderboard && <LeaderboardModal onClose={() => setShowLeaderboard(false)} />}
+      </div>
+      
+  {showLeaderboard && <LeaderboardModal onClose={() => setShowLeaderboard(false)} />}
       {showCrawl && (
         <div className="ss-crawl-overlay" onClick={skipCrawl} role="dialog" aria-modal="true">
           {/* background galaxies/stars for the intro */}
