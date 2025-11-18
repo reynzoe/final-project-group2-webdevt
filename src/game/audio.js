@@ -14,6 +14,7 @@ const createAudio = (src, options = {}) => {
 }
 
 export const audio = {
+  crawlMusic: createAudio(['/audio/crawl.mp3'], { loop: true }),
   backgroundMusic: createAudio(['/audio/backgroundMusic.mp3'], { loop: true }),
   bomb: createAudio(['/audio/bomb.mp3']),
   bonus: createAudio(['/audio/bonus.mp3'], { volume: 0.8 }),

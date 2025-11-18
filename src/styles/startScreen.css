@@ -1,4 +1,7 @@
 /* File: src/styles/startScreen.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Orbitron:wght@500;700;900&display=swap');
+
 .react-start-screen {
     position: absolute;
     inset: 0;
@@ -300,7 +303,7 @@
 
 /* --- Fonts and Crawl styles --- */
 /* import Google fonts: Orbitron (title) and Cinzel (crawl) */
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Orbitron:wght@500;700;900&display=swap');
+
 
 /* Star Wars style crawl */
 .ss-crawl-overlay{
