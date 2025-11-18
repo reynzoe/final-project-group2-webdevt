@@ -34,30 +34,20 @@ function AppContent() {
   return (
 <div id="parentDiv" className="relative w-full h-full font-arcade select-none overflow-hidden">
       {/* HUD / Score */}
-      <div id="scoreContainer" className="absolute z-20 left-3 top-3 m-0 hidden">
-        <div className="hud bg-transparent p-2 rounded-md">
-          <div className="hud-row flex items-center gap-3">
-            <div className="hud-item text-white text-sm">Player: <span id="hudUsername" className="font-bold">guest</span></div>
-            <div className="hud-item text-white text-sm">Coins: <span id="hudCoins" className="font-bold">0</span></div>
-            <div className="hud-item text-white text-sm">Score: <span id="scoreEl" className="font-bold">0</span></div>
-          </div>
-          <div className="hud-row mt-2 flex items-center gap-3">
-            <div className="hud-item text-white text-sm">Role: <span id="hudRole" className="font-bold">player</span></div>
-            <div className="hud-item text-white text-sm">Skin:
-              <img id="hudSkinImg" src="/img/spaceship.png" alt="skin" className="ml-2 w-8 h-6 object-contain rounded-sm border" />
-              <span id="hudSkin" className="ml-2 font-bold">default</span>
-            </div>
-            <div className="hud-item text-white text-sm flex items-center gap-2">Projectile:
-              <div id="hudProjectileSwatch" className="w-6 h-4 rounded-sm border" style={{background:'lightblue'}} />
-            </div>
-            <div className="hud-item text-white text-sm">Lives: <span id="hudLives" className="font-bold">-</span></div>
-          </div>
+  <div id="scoreContainer" className="absolute z-20 left-3 top-3 m-0 hidden">
+    <div className="hud bg-transparent p-2 rounded-md">
+      <div className="hud-row flex items-center gap-3">
+        <div className="hud-item text-white text-sm">Player: <span id="hudUsername" className="font-bold">guest</span></div>
+        <div className="hud-item text-white text-sm">Coins: <span id="hudCoins" className="font-bold">0</span></div>
+        <div className="hud-item text-white text-sm">Score: <span id="scoreEl" className="font-bold">0</span></div>
+        <div className="hud-item text-white text-sm flex items-center gap-2">Projectile:
+          <div id="hudProjectileSwatch" className="w-6 h-4 rounded-sm border" style={{background:'lightblue'}} />
         </div>
       </div>
+    </div>
+  </div>
 
-    
-
-      {/* Canvas */}
+  {/* Canvas */}
       <canvas ref={canvasRef} className="" />
 
       {/* Required hidden original DOM elements */}

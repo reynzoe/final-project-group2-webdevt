@@ -93,7 +93,7 @@ export default function StartScreen() {
     try {
       const v = localStorage.getItem('sk_autoplay_intro')
       return v === null ? true : v === 'true'
-    } catch (e) {
+    } catch {
       return true
     }
   })
@@ -129,14 +129,14 @@ export default function StartScreen() {
   useEffect(() => {
     try {
       localStorage.setItem('sk_autoplay_intro', introAutoPlay ? 'true' : 'false')
-    } catch (e) {
+    } catch {
       // ignore
     }
   }, [introAutoPlay])
 
   const [showSettings, setShowSettings] = useState(false)
   const [soundVolume, setSoundVolume] = useState(() => {
-    try { return parseFloat(localStorage.getItem('sk_sound_volume')) ?? 0.5 } catch (e) { return 0.5 }
+    try { return parseFloat(localStorage.getItem('sk_sound_volume')) ?? 0.5 } catch { return 0.5 }
   })
 
   useEffect(() => {
@@ -146,7 +146,7 @@ export default function StartScreen() {
         if (a && typeof a.volume === 'function') a.volume(soundVolume)
       })
     } catch (e) {}
-    try { localStorage.setItem('sk_sound_volume', String(soundVolume)) } catch (e) {}
+    try { localStorage.setItem('sk_sound_volume', String(soundVolume)) } catch  {}
   }, [soundVolume])
 
   useEffect(() => {
@@ -179,17 +179,22 @@ export default function StartScreen() {
   }
 
   function handleStartGame() {
-    // clear any guest intent and show the crawl; user will click BEGIN to actually start
-    guestIntentRef.current = false
-    setShowCrawl(true)
-    setShowBegin(false)
+    // For logged-in users: skip intro and start immediately
+    try { audio.select.play() } catch { /* ignore */ }
     if (beginTimerRef.current) clearTimeout(beginTimerRef.current)
-    beginTimerRef.current = setTimeout(() => setShowBegin(true), 14000)
+    if (crawlTimerRef.current) clearTimeout(crawlTimerRef.current)
+    setShowCrawl(false)
+    setShowBegin(false)
+
+    // Start the game
+    if (typeof startGame === 'function') startGame()
+    const startButton = document.querySelector('#startButton')
+    if (startButton) startButton.click()
   }
 
   function handleGuestPlay() {
     // For guest play: play a short select sound, skip the intro and start the game immediately
-    try { audio.select.play() } catch (e) { /* ignore */ }
+    try { audio.select.play() } catch { /* ignore */ }
     if (beginTimerRef.current) clearTimeout(beginTimerRef.current)
     if (crawlTimerRef.current) clearTimeout(crawlTimerRef.current)
     guestIntentRef.current = false
