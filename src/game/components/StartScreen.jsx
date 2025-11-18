@@ -75,8 +75,6 @@ export default function StartScreen() {
 
   const crawlTimerRef = React.useRef(null)
   const beginTimerRef = React.useRef(null)
-  const shownCrawlRef = React.useRef(false)
-  const guestIntentRef = React.useRef(false)
 
   const [stage, setStage] = useState('welcome')
   const [username, setUsername] = useState('')
@@ -87,7 +85,6 @@ export default function StartScreen() {
   const [guestPlaying, setGuestPlaying] = useState(false)
   const [showShop, setShowShop] = useState(false)
   const [showCrawl, setShowCrawl] = useState(false)
-  const [showBegin, setShowBegin] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
 
   const [introAutoPlay, setIntroAutoPlay] = useState(() => {
@@ -119,27 +116,14 @@ export default function StartScreen() {
     return () => {
       if (crawlTimerRef.current) clearTimeout(crawlTimerRef.current)
       if (beginTimerRef.current) clearTimeout(beginTimerRef.current)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (stage === 'welcome' && !shownCrawlRef.current && introAutoPlay) {
-      shownCrawlRef.current = true
-      setShowCrawl(true)
-
-      // Play background music when crawl starts
+      // Stop music when component unmounts
       try {
-        audio.crawlMusic.play()
+        audio.crawlMusic.stop()
       } catch {
         // ignore
       }
-
-      beginTimerRef.current = setTimeout(() => setShowBegin(true), 14000)
     }
-    return () => {
-      if (beginTimerRef.current) clearTimeout(beginTimerRef.current)
-    }
-  }, [stage, introAutoPlay])
+  }, [])
 
   useEffect(() => {
     try {
@@ -173,6 +157,26 @@ export default function StartScreen() {
     }
   }, [stage])
 
+  function handleBeginClick() {
+    setShowCrawl(true)
+
+    try {
+      audio.crawlMusic.play()
+    } catch {
+      // ignore
+    }
+
+    beginTimerRef.current = setTimeout(() => {
+      setShowCrawl(false)
+      setStage('login')
+      try {
+        audio.crawlMusic.stop()
+      } catch {
+        // ignore
+      }
+    }, 14000)
+  }
+
   async function handleRegister() {
     try {
       setError('')
@@ -188,6 +192,12 @@ export default function StartScreen() {
       setError('')
       await login({ username, password })
       setStage('loggedIn')
+      // Stop music when logging in
+      try {
+        audio.crawlMusic.stop()
+      } catch {
+        // ignore
+      }
     } catch (err) {
       setError(err.message)
     }
@@ -202,7 +212,13 @@ export default function StartScreen() {
     if (beginTimerRef.current) clearTimeout(beginTimerRef.current)
     if (crawlTimerRef.current) clearTimeout(crawlTimerRef.current)
     setShowCrawl(false)
-    setShowBegin(false)
+
+    // Stop music when starting game
+    try {
+      audio.crawlMusic.stop()
+    } catch {
+      // ignore
+    }
 
     if (typeof startGame === 'function') startGame()
     const startButton = document.querySelector('#startButton')
@@ -217,9 +233,15 @@ export default function StartScreen() {
     }
     if (beginTimerRef.current) clearTimeout(beginTimerRef.current)
     if (crawlTimerRef.current) clearTimeout(crawlTimerRef.current)
-    guestIntentRef.current = false
     setShowCrawl(false)
-    setShowBegin(false)
+
+    // Stop music when playing as guest
+    try {
+      audio.crawlMusic.stop()
+    } catch {
+      // ignore
+    }
+
     const startButton = document.querySelector('#startButton')
     if (startButton) startButton.click()
     setGuestPlaying(true)
@@ -229,32 +251,17 @@ export default function StartScreen() {
     if (crawlTimerRef.current) clearTimeout(crawlTimerRef.current)
     if (beginTimerRef.current) clearTimeout(beginTimerRef.current)
     setShowCrawl(false)
-    setShowBegin(false)
-    guestIntentRef.current = false
+    setStage('login')
+
+    // Stop music when skipping crawl
+    try {
+      audio.crawlMusic.stop()
+    } catch {
+      // ignore
+    }
   }
 
-  function beginGame() {
-    if (beginTimerRef.current) clearTimeout(beginTimerRef.current)
-    if (crawlTimerRef.current) clearTimeout(crawlTimerRef.current)
-    setShowCrawl(false)
-    setShowBegin(false)
-
-    const startButton = document.querySelector('#startButton')
-    if (guestIntentRef.current) {
-      if (startButton) startButton.click()
-      setGuestPlaying(true)
-      guestIntentRef.current = false
-      return
-    }
-
-    if (user) {
-      if (typeof startGame === 'function') startGame()
-      if (startButton) startButton.click()
-      return
-    }
-
-    setShowCrawl(false)
-    setShowBegin(false)
+  function handleBackToLogin() {
     setStage('login')
   }
 
@@ -283,24 +290,38 @@ export default function StartScreen() {
     if (user.role === 'admin') {
       return (
           <>
-            <div className="fixed inset-0 flex items-center justify-center p-6 z-40">
-              <div className="w-full max-w-3xl bg-[#07070a]/95 border border-blue-900/30 rounded-2xl p-6 shadow-xl">
-                <div className="flex items-center justify-between mb-4">
-                  <h1 className="text-3xl text-white font-bold tracking-wide">Admin Panel</h1>
-                  <button
-                      className="py-2 px-4 rounded-md bg-gradient-to-r from-indigo-700 to-cyan-500 text-white font-bold hover:scale-105 transition-transform"
-                      onClick={handleStartGame}
-                  >
-                    🚀 START GAME
-                  </button>
+            <div className="ss-wrapper fixed inset-0 z-40">
+              <div className="ss-stars" aria-hidden="true" />
+              <div className="ss-stars-2" aria-hidden="true" />
+
+              <div className="fixed inset-0 flex items-center justify-center p-6">
+                <div className="w-full max-w-3xl bg-[#07070a]/95 border border-blue-900/30 rounded-2xl p-6 shadow-xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <h1 className="text-3xl text-white font-bold tracking-wide">Admin Panel</h1>
+                    <div className="flex gap-3">
+                      <button
+                          className="py-2 px-4 rounded-md bg-gradient-to-r from-indigo-700 to-cyan-500 text-white font-bold hover:scale-105 transition-transform"
+                          onClick={handleStartGame}
+                      >
+                         START GAME
+                      </button>
+                      <button
+                          className="py-2 px-4 rounded-md bg-gradient-to-r from-red-700 to-rose-600 text-white font-bold hover:scale-105 transition-transform"
+                          onClick={handleLogout}
+                      >
+                         LOGOUT
+                      </button>
+                    </div>
+                  </div>
+                  <AdminDashboard />
                 </div>
-                <AdminDashboard />
               </div>
             </div>
             {showLeaderboard && <LeaderboardModal onClose={() => setShowLeaderboard(false)} />}
           </>
       )
     }
+
 
     return (
         <>
@@ -340,7 +361,6 @@ export default function StartScreen() {
     )
   }
 
-
   return (
       <div className="ss-wrapper fixed inset-0 z-40">
         <div className="ss-stars" aria-hidden="true" />
@@ -355,12 +375,10 @@ export default function StartScreen() {
 
             {stage === 'welcome' && (
                 <div className="flex flex-col gap-3">
-                  <button className="ss-btn ss-btn-primary" onClick={() => setStage('login')}>🔓 Login</button>
-                  <button className="ss-btn ss-btn-accent" onClick={() => setStage('register')}>✨ Register</button>
-                  <button className="ss-btn ss-btn-guest" onClick={handleGuestPlay}>🎮 Play as Guest</button>
+                  <button className="ss-btn ss-btn-primary w-full" onClick={handleBeginClick}>✨ BEGIN</button>
                   <div className="flex gap-2 justify-center">
-                    <button className="ss-btn ss-btn-ghost" onClick={() => setShowLeaderboard(true)}>🏆 View Leaderboard</button>
-                    <button className="ss-btn ss-btn-ghost" onClick={() => setShowSettings(true)}>⚙️ Settings</button>
+                    <button className="ss-btn ss-btn-ghost flex-1" onClick={() => setShowLeaderboard(true)}>🏆 Leaderboard</button>
+                    <button className="ss-btn ss-btn-ghost flex-1" onClick={() => setShowSettings(true)}>⚙️ Settings</button>
                   </div>
                 </div>
             )}
@@ -402,8 +420,8 @@ export default function StartScreen() {
                   {error && <div className="text-red-400 mb-3">{error}</div>}
 
                   <div className="ss-actions">
-                    <button className="ss-btn ss-btn-primary" onClick={handleRegister}>✅ Register</button>
-                    <button className="ss-btn ss-btn-ghost" onClick={() => setStage('welcome')}>← Back</button>
+                    <button className="ss-btn ss-btn-primary flex-1" onClick={handleRegister}>✅ Register</button>
+                    <button className="ss-btn ss-btn-ghost flex-1" onClick={handleBackToLogin}>← Back</button>
                   </div>
                 </div>
             )}
@@ -433,9 +451,10 @@ export default function StartScreen() {
 
                   {error && <div className="text-red-400 mb-3">{error}</div>}
 
-                  <div className="ss-actions">
-                    <button className="ss-btn ss-btn-primary" onClick={handleLogin}>🔒 Login</button>
-                    <button className="ss-btn ss-btn-ghost" onClick={() => setStage('welcome')}>← Back</button>
+                  <div className="flex flex-col gap-2">
+                    <button className="ss-btn ss-btn-primary w-full" onClick={handleLogin}>🔒 Login</button>
+                    <button className="ss-btn ss-btn-accent w-full" onClick={() => setStage('register')}>✨ Register</button>
+                    <button className="ss-btn ss-btn-guest w-full" onClick={handleGuestPlay}>🎮 Play as Guest</button>
                   </div>
                 </div>
             )}
@@ -452,7 +471,7 @@ export default function StartScreen() {
                 <div className="ss-crawl-stars" />
               </div>
 
-              <div className="ss-crawl-wrap" onClick={(e) => e.stopPropagation()}>
+              <div className="ss-crawl-wrap">
                 <div className="ss-crawl">
                   <span className="crawl-title">STAR KILLER</span>
                   <p>
@@ -466,12 +485,6 @@ export default function StartScreen() {
                   </p>
                   <p>May your reflexes be sharp and your lasers truer than the night.</p>
                 </div>
-
-                {showBegin && (
-                    <div className="ss-begin" onClick={beginGame} role="button" tabIndex={0}>
-                      BEGIN
-                    </div>
-                )}
               </div>
 
               <button className="close-crawl" onClick={(e) => { e.stopPropagation(); skipCrawl(); }}>Skip</button>

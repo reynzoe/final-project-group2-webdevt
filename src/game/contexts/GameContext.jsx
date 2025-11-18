@@ -8,6 +8,7 @@ export function GameProvider({ children }) {
     const [token, setToken] = useState(null);
     const [started, setStarted] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [projectileColor, setProjectileColor] = useState('lightblue'); // Add this
 
     // Auto-login on mount
     useEffect(() => {
@@ -37,6 +38,7 @@ export function GameProvider({ children }) {
                 const data = await res.json();
                 setUser(data.user);
                 setToken(savedToken);
+                setProjectileColor(data.user?.projectile?.equippedColor || 'lightblue'); // Add this
             } else {
                 localStorage.removeItem('spaceInvadersToken');
             }
@@ -59,6 +61,7 @@ export function GameProvider({ children }) {
 
         setUser(data.user);
         setToken(data.token);
+        setProjectileColor(data.user?.projectile?.equippedColor || 'lightblue'); // Add this
         localStorage.setItem('spaceInvadersToken', data.token);
         return data;
     }
@@ -74,9 +77,11 @@ export function GameProvider({ children }) {
 
         setUser(data.user);
         setToken(data.token);
+        setProjectileColor(data.user?.projectile?.equippedColor || 'lightblue'); // Add this
         localStorage.setItem('spaceInvadersToken', data.token);
         return data;
     }
+
 
     function logout() {
         setUser(null);
@@ -119,6 +124,11 @@ export function GameProvider({ children }) {
         })
         const data = await res.json()
         if (!res.ok) throw new Error(data.error || 'Equip failed')
+        setProjectileColor(color); // Existing line
+
+        // Dispatch event to update HUD immediately
+        window.dispatchEvent(new CustomEvent('projectileColorChanged', { detail: { color } }))
+
         await verifyToken(token)
         return data
     }
@@ -128,6 +138,7 @@ export function GameProvider({ children }) {
         token,
         started,
         loading,
+        projectileColor, // Add this
         register,
         login,
         logout,

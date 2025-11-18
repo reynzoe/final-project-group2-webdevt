@@ -47,7 +47,10 @@ function init() {
     if (hudUsername) hudUsername.innerText = user.username || 'guest'
     if (hudCoins) hudCoins.innerText = typeof user.coins === 'number' ? user.coins : 0
     if (hudSkin) hudSkin.innerText = user?.skin?.equipped || user?.skin || 'default'
-    if (hudSwatch) hudSwatch.style.background = (user?.projectile?.equippedColor) || 'lightblue'
+    if (hudSwatch) {
+      const equippedColor = user?.projectile?.equippedColor || 'lightblue'
+      hudSwatch.style.background = equippedColor
+    }
   } catch (e) {
     // ignore
   }
@@ -212,25 +215,36 @@ document.querySelector('#startButton').addEventListener('click', () => {
   document.querySelector('#startScreen').style.display = 'none'
   document.querySelector('#scoreContainer').style.display = 'block'
 
-  // update HUD again on start
+  // Force context update before init
+  const ctx = window.__gameContext || {}
+  const user = ctx.user || {}
+
+  // Update HUD immediately with latest context data
   try {
-    const ctx = window.__gameContext || {}
-    const user = ctx.user || {}
     const hudUsername = document.querySelector('#hudUsername')
     const hudCoins = document.querySelector('#hudCoins')
     const hudSkin = document.querySelector('#hudSkin')
     const hudSwatch = document.querySelector('#hudProjectileSwatch')
+    const hudLives = document.querySelector('#hudLives')
+
     if (hudUsername) hudUsername.innerText = user.username || 'guest'
     if (hudCoins) hudCoins.innerText = typeof user.coins === 'number' ? user.coins : 0
     if (hudSkin) hudSkin.innerText = user?.skin?.equipped || user?.skin || 'default'
-    if (hudSwatch) hudSwatch.style.background = (user?.projectile?.equippedColor) || 'lightblue'
-    const hudLives = document.querySelector('#hudLives')
-    if (hudLives) hudLives.innerText = (gameState.player && typeof gameState.player.lives === 'number') ? gameState.player.lives : hudLives.innerText
-  } catch (e) {}
+    if (hudSwatch) {
+      const equippedColor = user?.projectile?.equippedColor || 'lightblue'
+      hudSwatch.style.background = equippedColor
+    }
+    if (hudLives && gameState.player) {
+      hudLives.innerText = typeof gameState.player.lives === 'number' ? gameState.player.lives : '-'
+    }
+  } catch (e) {
+    console.error('HUD update error:', e)
+  }
 
   init()
   animate()
 })
+
 
 // Update HUD when user data changes (dispatched by GameContext)
 window.addEventListener('userCoinsUpdated', (e) => {
@@ -262,6 +276,18 @@ window.addEventListener('userCoinsUpdated', (e) => {
       else hudSkinImg.src = '/img/spaceship.png'
     }
     if (hudRole) hudRole.innerText = user.role || 'player'
+  } catch (err) {
+    // ignore
+  }
+})
+
+window.addEventListener('projectileColorChanged', (e) => {
+  try {
+    const color = e.detail?.color || 'lightblue'
+    const hudSwatch = document.querySelector('#hudProjectileSwatch')
+    if (hudSwatch) {
+      hudSwatch.style.background = color
+    }
   } catch (err) {
     // ignore
   }
