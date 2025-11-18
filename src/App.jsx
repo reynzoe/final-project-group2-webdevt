@@ -33,13 +33,27 @@ function AppContent() {
 
   return (
 <div id="parentDiv" className="relative w-full h-full font-arcade select-none overflow-hidden">
-      {/* Score */}
-      <p
-        id="scoreContainer"
-        className="absolute z-20 text-white left-3 top-3 m-0 hidden text-xl drop-shadow-[0_0_6px_#00f]"
-      >
-        <span>Score:</span> <span id="scoreEl">0</span>
-      </p>
+      {/* HUD / Score */}
+      <div id="scoreContainer" className="absolute z-20 left-3 top-3 m-0 hidden">
+        <div className="hud bg-transparent p-2 rounded-md">
+          <div className="hud-row flex items-center gap-3">
+            <div className="hud-item text-white text-sm">Player: <span id="hudUsername" className="font-bold">guest</span></div>
+            <div className="hud-item text-white text-sm">Coins: <span id="hudCoins" className="font-bold">0</span></div>
+            <div className="hud-item text-white text-sm">Score: <span id="scoreEl" className="font-bold">0</span></div>
+          </div>
+          <div className="hud-row mt-2 flex items-center gap-3">
+            <div className="hud-item text-white text-sm">Role: <span id="hudRole" className="font-bold">player</span></div>
+            <div className="hud-item text-white text-sm">Skin:
+              <img id="hudSkinImg" src="/img/spaceship.png" alt="skin" className="ml-2 w-8 h-6 object-contain rounded-sm border" />
+              <span id="hudSkin" className="ml-2 font-bold">default</span>
+            </div>
+            <div className="hud-item text-white text-sm flex items-center gap-2">Projectile:
+              <div id="hudProjectileSwatch" className="w-6 h-4 rounded-sm border" style={{background:'lightblue'}} />
+            </div>
+            <div className="hud-item text-white text-sm">Lives: <span id="hudLives" className="font-bold">-</span></div>
+          </div>
+        </div>
+      </div>
 
     
 
@@ -54,50 +68,35 @@ function AppContent() {
       {/* React Start Screen */}
       <StartScreen />
 
-      {/* Restart Screen */}
-      <div
-        id="restartScreen"
-        className="hidden absolute inset-0 z-30 bg-[url('/img/startScreenBackground.png')] bg-no-repeat bg-contain flex items-center justify-center"
-      >
-        <div className="text-center">
-          <h1 className="text-white text-3xl drop-shadow-[0_0_8px_#f00]">Game Over</h1>
-          <h1 id="finalScore" className="text-white text-6xl mt-2 drop-shadow-[0_0_10px_#ff0]">0</h1>
+      {/* Restart Screen (styled like Start Screen) */}
+      <div id="restartScreen" className="hidden absolute inset-0 z-30 flex items-center justify-center">
+        <div className="ss-stars" aria-hidden="true" />
+        <div className="ss-stars-2" aria-hidden="true" />
+
+        <div className="ss-card ss-card--gameover p-6 text-center">
+          <div className="ss-header mb-4">
+            <img src="/img/spaceship.png" alt="logo" className="ss-logo" />
+            <h1 className="ss-title ss-title--danger">Game Over</h1>
+          </div>
+
+          <h1 id="finalScore" className="text-6xl mt-2 text-white drop-shadow-[0_0_10px_#ff0]">0</h1>
           <p className="text-white text-lg -mt-2">Points</p>
 
-          <p
-            id="coinsEarned"
-            className="text-yellow-400 text-xl font-bold my-2 hidden drop-shadow-[0_0_6px_#ff0]"
-          >
+          <p id="coinsEarned" className="text-yellow-400 text-xl font-bold my-2 hidden drop-shadow-[0_0_6px_#ff0]">
             +0 coins earned!
           </p>
 
           <div className="flex gap-4 justify-center mt-4">
-            {/* Restart Button */}
-            <div
-              id="restartButton"
-              className="relative cursor-pointer inline-block hover:scale-105 transition-transform"
-            >
-              <img src="/img/button.png" alt="Restart Button" />
-              <span className="absolute text-white top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_0_5px_#000]">
-                Restart
-              </span>
-            </div>
+            {/* Restart Button (themed) */}
+            <button id="restartButton" className="ss-btn ss-btn-primary">Restart</button>
 
             {/* Leaderboard */}
-            <button
-              id="viewLeaderboardButton"
-              className="px-3 py-2 bg-black/70 text-white border border-blue-500 rounded-lg cursor-pointer
-                         hover:bg-blue-700/40 hover:scale-105 transition-all"
-            >
+            <button id="viewLeaderboardButton" className="ss-btn ss-btn-ghost">
               View Leaderboard
             </button>
 
             {/* Main Menu */}
-            <button
-              id="mainMenuButton"
-              className="px-3 py-2 bg-black/70 text-white border border-pink-500 rounded-lg cursor-pointer
-                         hover:bg-pink-700/40 hover:scale-105 transition-all"
-            >
+            <button id="mainMenuButton" className="ss-btn ss-btn-ghost">
               Main Menu
             </button>
           </div>

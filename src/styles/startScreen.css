@@ -124,3 +124,292 @@
     gap: 4px;
     margin-top: 8px;
 }
+
+/* --- Space / Star Wars themed additions --- */
+.ss-wrapper{
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 40;
+    overflow: hidden;
+    background: radial-gradient(ellipse at center, rgba(8,8,12,0.85) 0%, rgba(2,2,6,0.95) 60%);
+}
+
+.ss-stars, .ss-stars-2{
+    position: absolute;
+    inset: 0;
+    background-repeat: repeat;
+    background-size: contain;
+    pointer-events: none;
+}
+
+.ss-stars{
+    background-image: radial-gradient(#ffffff33 1px, transparent 1px);
+    background-size: 2px 2px;
+    opacity: 0.9;
+    animation: twinkle 6s linear infinite;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.06));
+}
+
+.ss-stars-2{
+    background-image: radial-gradient(#ffffff11 1px, transparent 1px);
+    background-size: 4px 4px;
+    opacity: 0.6;
+    transform: translateZ(0);
+    animation: drift 30s linear infinite;
+}
+
+@keyframes twinkle{
+    0%{opacity:0.8}
+    50%{opacity:1}
+    100%{opacity:0.8}
+}
+
+@keyframes drift{
+    0%{transform:translateY(0) translateX(0)}
+    50%{transform:translateY(-30px) translateX(20px)}
+    100%{transform:translateY(0) translateX(0)}
+}
+
+.ss-card{
+    position: relative;
+    z-index: 10;
+    min-width: 320px;
+    max-width: 720px;
+    width: min(92vw, 720px);
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(10,10,14,0.75), rgba(5,5,10,0.5));
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 12px 60px rgba(0,0,0,0.7), 0 0 60px rgba(40,120,255,0.03) inset;
+    backdrop-filter: blur(6px) saturate(120%);
+    color: #e9f2ff;
+    text-align: center;
+}
+
+/* internal padding container for consistent spacing */
+.ss-card-inner{
+    padding: 28px 28px 22px 28px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+/* Game over card modifier */
+.ss-card--gameover{
+    background: linear-gradient(180deg, rgba(30,10,6,0.85), rgba(40,8,6,0.6));
+    border: 1px solid rgba(255,120,64,0.12);
+    box-shadow: 0 12px 60px rgba(220,80,20,0.18), 0 0 40px rgba(200,60,10,0.06) inset;
+}
+
+.ss-header{display:flex;align-items:center;justify-content:center;gap:14px}
+.ss-logo{width:64px;height:auto;filter:drop-shadow(0 8px 20px rgba(0,120,255,0.12));}
+
+.ss-title{
+    font-family: 'Orbitron', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    font-size:34px;
+    font-weight:800;
+    letter-spacing:5px;
+    color:#e8f6ff;
+    text-transform:uppercase;
+    margin:0;
+    /* slightly toned glow for legibility */
+    text-shadow: 0 0 28px rgba(94,169,255,0.22), 0 6px 18px rgba(0,0,0,0.6);
+}
+
+.ss-title--danger{
+    color:#ffd8b8;
+    text-shadow:
+        0 0 28px rgba(255,140,60,0.22),
+        0 0 12px rgba(255,100,40,0.18),
+        0 8px 18px rgba(0,0,0,0.6);
+}
+
+.ss-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:12px 18px;
+    min-height:44px;
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer;
+    border:none;
+    width:100%;
+    font-size:14px;
+    transition:transform .12s ease, box-shadow .12s ease, background-color .12s ease;
+}
+
+.ss-btn:active{transform:translateY(1px)}
+
+.ss-btn-primary{
+    /* deep cyan -> electric blue */
+    background: linear-gradient(90deg,#0ea5ff 0%, #4cc8ff 100%);
+    color:#041127;
+    box-shadow:0 10px 30px rgba(28,169,255,0.18), 0 2px 6px rgba(0,0,0,0.45);
+}
+
+.ss-btn-accent{
+    /* gold accent for Star Wars feel */
+    background: linear-gradient(90deg,#ffd36b 0%, #ffb347 100%);
+    color:#1a0511;
+    box-shadow:0 10px 28px rgba(255,168,60,0.14);
+}
+
+.ss-btn-guest{
+    /* violet -> cyan mix */
+    background: linear-gradient(90deg,#9b7bff 0%, #6bd6ff 100%);
+    color:#041026;
+}
+
+.ss-btn-ghost{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.06);
+    color:#dfefff;
+}
+
+.ss-btn + .ss-btn{margin-top:10px}
+
+/* Inputs: keep dark theme but neat */
+.react-start-input{background:rgba(8,10,16,0.6);border:1px solid rgba(255,255,255,0.04);}
+
+/* Inputs inside the card */
+.ss-form input[type="text"], .ss-form input[type="password"], .ss-form input[type="email"]{
+    width:100%;
+    padding:12px 14px;
+    border-radius:8px;
+    background:rgba(8,10,16,0.6);
+    border:1px solid rgba(255,255,255,0.04);
+    color:#fff;
+    box-sizing:border-box;
+    font-size:14px;
+}
+
+.ss-actions{display:flex;gap:10px;flex-wrap:wrap}
+.ss-actions .ss-btn{flex:1}
+
+/* small footer */
+.ss-footer{margin-top:12px;font-size:12px;color:#9fb7ff77}
+
+/* Accessibility: reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce){
+    .ss-stars, .ss-stars-2{animation:none}
+}
+
+/* --- Fonts and Crawl styles --- */
+/* import Google fonts: Orbitron (title) and Cinzel (crawl) */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Orbitron:wght@500;700;900&display=swap');
+
+/* Star Wars style crawl */
+.ss-crawl-overlay{
+    position:fixed;
+    inset:0;
+    background:#000;
+    z-index:80;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    overflow:hidden;
+    perspective:600px;
+}
+
+.ss-crawl{
+    width:70%;
+    max-width:900px;
+    transform-origin:50% 100%;
+    transform:rotateX(20deg) translateZ(0);
+    color:#ffdf8a;
+    font-family: 'Cinzel', serif;
+    text-align:center;
+    line-height:1.6;
+    font-size:20px;
+    text-shadow:0 2px 8px rgba(0,0,0,0.75);
+    will-change:transform;
+    animation: crawl 14s linear forwards;
+}
+
+.ss-crawl .crawl-title{font-size:18px;font-weight:700;margin-bottom:18px;letter-spacing:6px}
+.ss-crawl p{margin:6px 0}
+
+.ss-crawl .close-crawl{position:fixed;top:16px;right:18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.06);color:#e9f2ff;padding:8px 10px;border-radius:8px;cursor:pointer;z-index:90}
+
+@keyframes crawl{
+    0%{transform:translateY(100%) rotateX(20deg) scale(1)}
+    100%{transform:translateY(-300%) rotateX(20deg) scale(1)}
+}
+
+/* reduce motion */
+@media (prefers-reduced-motion: reduce){
+    .ss-crawl{animation:none;opacity:1}
+}
+
+/* fading clickable BEGIN text */
+.ss-begin{
+    display:block;
+    margin:18px auto 6px;
+    font-family: 'Orbitron', sans-serif;
+    color:#fff8d6;
+    font-weight:800;
+    letter-spacing:6px;
+    cursor:pointer;
+    text-transform:uppercase;
+    text-align:center;
+    font-size:20px;
+    z-index:91;
+    animation: beginPulse 1.8s ease-in-out infinite;
+    text-shadow: 0 0 18px rgba(255,220,120,0.16), 0 4px 18px rgba(0,0,0,0.6);
+}
+
+@keyframes beginPulse{
+    0%{opacity:0.25;transform:translateY(0)}
+    50%{opacity:1;transform:translateY(-6px)}
+    100%{opacity:0.25;transform:translateY(0)}
+}
+
+/* place the BEGIN below the crawl content */
+.ss-crawl-wrap{display:flex;flex-direction:column;align-items:center;position:relative;z-index:92}
+
+/* Crawl background stars and galaxies */
+.ss-crawl-bg{position:absolute;inset:0;z-index:79;pointer-events:none;overflow:hidden}
+.ss-crawl-stars{position:absolute;inset:0;background-image:radial-gradient(#ffffff22 1px, transparent 1px);background-size:3px 3px;opacity:0.9;filter:blur(0.6px)}
+.ss-galaxy{position:absolute;width:520px;height:520px;border-radius:50%;filter:blur(36px);opacity:0.22;mix-blend-mode:screen}
+.ss-galaxy-1{left:10%;top:8%;background:radial-gradient(circle at 30% 35%, #7fd6ff 0%, #2e9fff 10%, rgba(60,80,140,0.02) 60%);transform:rotate(12deg);animation:spinSlow 60s linear infinite}
+.ss-galaxy-2{right:8%;bottom:10%;width:640px;height:640px;background:radial-gradient(circle at 60% 40%, #ffd78a 0%, #ff9f6b 12%, rgba(60,10,30,0.02) 60%);transform:rotate(-8deg);animation:spinSlow 90s linear infinite}
+
+@keyframes spinSlow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* ensure BEGIN is clearly visible over background */
+.ss-begin{font-size:22px;padding:8px 18px;background:linear-gradient(90deg,#ffdf8a, #ffd08a);border-radius:8px;color:#081026;box-shadow:0 12px 40px rgba(255,200,120,0.14)}
+
+/* slightly darker semi-transparent panel behind the crawl text for legibility */
+.ss-crawl{background:linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.02));padding:18px;border-radius:8px}
+
+.close-crawl{position:fixed;top:12px;right:14px;z-index:95}
+
+/* Toggle button for small settings */
+.ss-toggle{padding:8px 12px;font-size:13px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:#dfefff}
+.ss-toggle:hover{background:rgba(255,255,255,0.02)}
+
+/* HUD styles */
+.hud{background:linear-gradient(180deg, rgba(5,8,16,0.45), rgba(5,8,16,0.25));padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 8px 24px rgba(0,0,0,0.6);}
+.hud-row{display:flex;align-items:center;gap:12px}
+.hud-item{display:flex;align-items:center;gap:6px}
+#hudProjectileSwatch{width:22px;height:12px;border-radius:3px;border:1px solid rgba(255,255,255,0.06);box-shadow:0 6px 18px rgba(0,0,0,0.45)}
+
+/* skin img in HUD */
+#hudSkinImg{width:36px;height:24px;object-fit:contain;border-radius:6px;border:1px solid rgba(255,255,255,0.06);box-shadow:0 6px 18px rgba(0,0,0,0.45);}
+
+/* role badge */
+#hudRole{padding:4px 8px;border-radius:8px;background:rgba(255,255,255,0.02);color:#fff}
+
+/* lives */
+#hudLives{color:#ffd36b}
+
+/* Settings modal small tweaks */
+.ss-btn.active{box-shadow:0 8px 30px rgba(76,200,255,0.12);}
+
+/* Coin bump animation */
+.hud-coin-bump{animation: coinBump 0.9s ease}
+@keyframes coinBump{0%{transform:scale(1);color:#ffd36b}25%{transform:scale(1.25);color:#fff}60%{transform:scale(0.95)}100%{transform:scale(1)}}
