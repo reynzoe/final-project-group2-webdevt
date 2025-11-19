@@ -336,19 +336,19 @@ export default function StartScreen() {
 
                 <div className="flex flex-col gap-3">
                   <button className="py-2 rounded-md bg-gradient-to-r from-indigo-700 to-cyan-500 text-white font-bold hover:scale-105 transition-transform" onClick={handleStartGame}>
-                    🚀 START GAME
+                     START GAME
                   </button>
 
                   <button className="py-2 rounded-md bg-transparent border border-blue-700 text-blue-200 hover:bg-blue-800/30 transition" onClick={() => setShowLeaderboard(true)}>
-                    🏆 View Leaderboard
+                     View Leaderboard
                   </button>
 
                   <button className="py-2 rounded-md bg-transparent border border-blue-700 text-blue-200 hover:bg-blue-800/30 transition" onClick={() => setShowShop(true)}>
-                    🛒 Shop
+                     Shop
                   </button>
 
                   <button className="py-2 rounded-md bg-transparent border border-red-700 text-red-200 hover:bg-red-800/30 transition" onClick={handleLogout}>
-                    🚪 Logout
+                     Logout
                   </button>
                 </div>
               </div>
@@ -375,10 +375,10 @@ export default function StartScreen() {
 
             {stage === 'welcome' && (
                 <div className="flex flex-col gap-3">
-                  <button className="ss-btn ss-btn-primary w-full" onClick={handleBeginClick}>✨ BEGIN</button>
+                  <button className="ss-btn ss-btn-primary w-full" onClick={handleBeginClick}> BEGIN</button>
                   <div className="flex gap-2 justify-center">
-                    <button className="ss-btn ss-btn-ghost flex-1" onClick={() => setShowLeaderboard(true)}>🏆 Leaderboard</button>
-                    <button className="ss-btn ss-btn-ghost flex-1" onClick={() => setShowSettings(true)}>⚙️ Settings</button>
+                    <button className="ss-btn flex-1" onClick={() => setShowLeaderboard(true)}> Leaderboard</button>
+                    <button className="ss-btn  flex-1" onClick={() => setShowSettings(true)}> Settings</button>
                   </div>
                 </div>
             )}
@@ -452,9 +452,9 @@ export default function StartScreen() {
                   {error && <div className="text-red-400 mb-3">{error}</div>}
 
                   <div className="flex flex-col gap-2">
-                    <button className="ss-btn ss-btn-primary w-full" onClick={handleLogin}>🔒 Login</button>
-                    <button className="ss-btn ss-btn-accent w-full" onClick={() => setStage('register')}>✨ Register</button>
-                    <button className="ss-btn ss-btn-guest w-full" onClick={handleGuestPlay}>🎮 Play as Guest</button>
+                    <button className="ss-btn ss-btn-primary w-full" onClick={handleLogin}> Login</button>
+                    <button className="ss-btn ss-btn-accent w-full" onClick={() => setStage('register')}> Register</button>
+                    <button className="ss-btn ss-btn-guest w-full" onClick={handleGuestPlay}> Play as Guest</button>
                   </div>
                 </div>
             )}

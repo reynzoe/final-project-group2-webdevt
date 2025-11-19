@@ -78,15 +78,15 @@ function AppContent() {
 
           <div className="flex gap-4 justify-center mt-4">
             {/* Restart Button (themed) */}
-            <button id="restartButton" className="ss-btn ss-btn-primary">Restart</button>
+            <button id="restartButton" className="ss-btn ">Restart</button>
 
             {/* Leaderboard */}
-            <button id="viewLeaderboardButton" className="ss-btn ss-btn-ghost">
+            <button id="viewLeaderboardButton" className="ss-btn ">
               View Leaderboard
             </button>
 
             {/* Main Menu */}
-            <button id="mainMenuButton" className="ss-btn ss-btn-ghost">
+            <button id="mainMenuButton" className="ss-btn ">
               Main Menu
             </button>
           </div>
