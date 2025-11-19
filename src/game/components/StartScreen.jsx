@@ -420,8 +420,8 @@ export default function StartScreen() {
                   {error && <div className="text-red-400 mb-3">{error}</div>}
 
                   <div className="ss-actions">
-                    <button className="ss-btn ss-btn-primary flex-1" onClick={handleRegister}>✅ Register</button>
-                    <button className="ss-btn ss-btn-ghost flex-1" onClick={handleBackToLogin}>← Back</button>
+                    <button className="ss-btn " onClick={handleRegister}> Register</button>
+                    <button className="ss-btn " onClick={handleBackToLogin}>← Back</button>
                   </div>
                 </div>
             )}
